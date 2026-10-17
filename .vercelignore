@@ -1,0 +1,4 @@
+node_modules
+dist
+.claude
+dev-server.mjs
