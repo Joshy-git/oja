@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useStore } from '../store/Store'
-import { Page, Reveal, Grid, Rail, SectionHead, Countdown } from '../components/ui'
+import { Page, Reveal, Grid, SectionHead, Countdown } from '../components/ui'
 import { CATEGORIES, imgUrl, imagesFor } from '../data/catalog'
 import { Icon } from '../components/Icon'
 import { personalizedFeed, discountPct } from '../lib/commerce'
@@ -199,7 +199,8 @@ export default function Home() {
             <SectionHead kicker="Ends tonight" title={<span className="row-ico"><Icon name="Zap" size={24} className="accent" fill="currentColor" /> Flash deals</span>} to="/deals">
               <span className="muted small">Ends in</span> <Countdown to={flashEnds} />
             </SectionHead>
-            <Rail products={deals.slice(0, 10)} />
+            {/* A fixed row, not a scroller; See all opens /deals with every deal */}
+            <Grid products={deals.slice(0, 5)} className="grid-5 flash-grid" />
           </section>
         </ExploreInterests>
       </div>
