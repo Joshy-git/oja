@@ -140,25 +140,6 @@ function TrustStrip() {
   )
 }
 
-function Journey() {
-  const steps = [['Factory', 'Sourced', 'Vetted suppliers in Guangzhou, Yiwu & Shenzhen'], ['ScanSearch', 'Inspected', 'Quality-checked in our China warehouse'], ['Plane', 'Shipped', 'Consolidated air & sea freight'], ['Stamp', 'Cleared', 'Customs handled by Cargoland'], ['Bike', 'Delivered', 'Last-mile riders across Nigeria']]
-  return (
-    <section className="journey">
-      <Reveal><div className="kicker light">How Oja works</div><h2>From Asia, Europe, America to your doorstep, we handle every step.</h2></Reveal>
-      <div className="journey-track">
-        <motion.div className="journey-line" initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 1.4, ease: 'easeInOut' }} />
-        {steps.map(([e, t, s], k) => (
-          <motion.div key={t} className="journey-step" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.25 + k * 0.22 }}>
-            <div className="journey-ico"><Icon name={e} size={26} /></div>
-            <b>{t}</b>
-            <span>{s}</span>
-          </motion.div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 // "Oja Week" product feed: left-aligned heading, category pills, 5-up grid
 function ExploreInterests({ feed, live, personalised, children }) {
   const [tab, setTab] = useState('rec')
@@ -223,7 +204,6 @@ export default function Home() {
         </ExploreInterests>
       </div>
 
-      <Journey />
     </Page>
   )
 }

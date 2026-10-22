@@ -352,13 +352,6 @@ section { margin-top: 40px; }
 .trust-item .icon { color: var(--accent); }
 .trust-arrow { margin-left: 2px; flex-shrink: 0; transition: transform .15s; }
 .trust:hover .trust-arrow { transform: translateX(3px); }
-.journey { margin-top: 56px; background: var(--brand-ink); color: #fff; padding: 56px 20px; text-align: center; }
-.journey h2 { color: #fff; max-width: 640px; margin: 4px auto 0; }
-.journey-track { position: relative; max-width: 1080px; margin: 44px auto 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-.journey-line { position: absolute; top: 32px; left: 10%; right: 10%; height: 3px; background: linear-gradient(90deg, var(--accent), var(--sun)); transform-origin: left; }
-.journey-step { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; }
-.journey-step span { opacity: .75; max-width: 180px; }
-.journey-ico { width: 66px; height: 66px; border-radius: 50%; background: #132d5e; border: 3px solid var(--accent); display: grid; place-items: center; color: var(--sun); margin-bottom: 6px; }
 .flash { background: linear-gradient(135deg, #fff4ea, #fff); border: 1.5px solid #ffe0c7; border-radius: var(--r-lg); padding: 20px 20px 8px; }
 
 /* ---------- Search ---------- */
@@ -951,9 +944,6 @@ section { margin-top: 40px; }
   .auth-ways .auth-opt { padding-left: max(16px, 14%); }
   .lang-btn { padding: 8px 6px; gap: 5px; }
   .lang-btn > span { display: none; }
-  .journey-track { grid-template-columns: 1fr; gap: 20px; }
-  .journey-line { left: 50%; right: auto; top: 0; bottom: 0; width: 3px; height: auto; transform-origin: top; }
-  .journey-step b, .journey-step span { position: relative; display: inline-block; background: var(--brand-ink); padding: 2px 10px; }
   .trust { font-size: 14px; padding: 12px 14px; }
   .trust-item { font-size: 13px; }
   .sale-phone { width: 230px; padding: 24px 12px 58px; border-width: 6px; border-radius: 32px; }
@@ -1363,3 +1353,5 @@ section { margin-top: 40px; }
 .pay-choose-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 @media (max-width: 560px) { .pay-choose .methods { grid-template-columns: 1fr; } .pay-choose-actions .btn { flex: 1; } }
 .flash-in-explore { margin-bottom: 26px; }
+
+.footer-tagline { margin: 18px 0 0; max-width: 300px; font-family: var(--display); font-size: 17px; font-weight: 700; line-height: 1.35; color: #fff; }
