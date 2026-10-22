@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store/Store'
@@ -13,7 +14,7 @@ const METHODS = [
   { id: 'ussd', label: 'USSD', sub: '*737#, *894#, *919# and more', ico: 'Hash' },
   { id: 'flutterwave', label: 'Flutterwave', sub: 'Card, bank or mobile money', ico: 'Wallet' },
 ]
-const STEPS = ['Delivery', 'Payment', 'Review']
+const STEPS = ['Delivery', 'Review']
 
 function Stepper({ step }) {
   return (
@@ -60,6 +61,41 @@ function PaymentFlow({ method, total, onDone }) {
   )
 }
 
+// Payment comes after the review step: shoppers confirm the order first, then pick how to pay
+function PaymentChooser({ method, setMethod, total, onCancel, onPay }) {
+  useEffect(() => {
+    const esc = (e) => { if (e.key === 'Escape') onCancel() }
+    document.addEventListener('keydown', esc)
+    return () => document.removeEventListener('keydown', esc)
+  }, [onCancel])
+  return createPortal(
+    <>
+      <motion.div className="scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onCancel} />
+      <motion.div className="modal pay-choose" role="dialog" aria-modal="true" aria-labelledby="pay-title" initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={spring}>
+        <div className="pay-choose-head">
+          <div><h3 id="pay-title">Payment</h3><p className="muted small">Choose how you'd like to pay {naira(total)}</p></div>
+          <button className="icon-btn" onClick={onCancel} aria-label="Close"><Icon name="X" size={20} /></button>
+        </div>
+        <div className="methods">
+          {METHODS.map((m) => (
+            <motion.label key={m.id} className={`method ${method === m.id ? 'on' : ''}`} whileTap={{ scale: 0.98 }}>
+              <input type="radio" name="pay-method" checked={method === m.id} onChange={() => setMethod(m.id)} />
+              <span className="method-ico"><Icon name={m.ico} size={22} /></span>
+              <div><b>{m.label}</b><div className="muted small">{m.sub}</div></div>
+              {method === m.id && <motion.span layoutId="method-check" className="method-check"><Icon name="Check" size={13} stroke={3} /></motion.span>}
+            </motion.label>
+          ))}
+        </div>
+        <p className="small muted">All amounts are charged in Naira (NGN). Oja never stores your card details.</p>
+        <div className="pay-choose-actions">
+          <button className="btn btn-ghost" onClick={onCancel}>Back to review</button>
+          <motion.button whileTap={{ scale: 0.97 }} className="btn btn-accent lg" onClick={onPay}>Pay {naira(total)}</motion.button>
+        </div>
+      </motion.div>
+    </>
+  , document.body)
+}
+
 export default function Checkout() {
   const { state, dispatch } = useStore()
   const nav = useNavigate()
@@ -70,6 +106,7 @@ export default function Checkout() {
   const [form, setForm] = useState({ name: state.user?.name || '', phone: '', line: '', state: state.deliveryState })
   const [phoneOk, setPhoneOk] = useState(false)
   const [method, setMethod] = useState('card')
+  const [choosing, setChoosing] = useState(false)
   const [paying, setPaying] = useState(false)
   const idem = useRef(makeOrderRef()) // idempotency key = order ref; stable across double-clicks
   const placed = useRef(false)
@@ -147,39 +184,21 @@ export default function Checkout() {
                     </label>
                   )}
                   {addr && <div className="eta-box"><Icon name="Truck" size={16} className="brand inline" /> Estimated delivery to {addr.state}: <b>{windowLabel(slowest, addr.state)}</b>{fromChina && <div className="small muted">Some items ship from our China warehouse — you'll get tracking at every step.</div>}</div>}
-                  <button className="btn btn-primary lg" disabled={!addr || !phoneOk} onClick={() => setStep(1)}>Continue to payment</button>
+                  <button className="btn btn-primary lg" disabled={!addr || !phoneOk} onClick={() => setStep(1)}>Continue to review</button>
                 </motion.section>
               )}
               {step === 1 && (
                 <motion.section key="s1" className="panel" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}>
-                  <h3>Payment method</h3>
-                  <div className="methods">
-                    {METHODS.map((m) => (
-                      <motion.label key={m.id} className={`method ${method === m.id ? 'on' : ''}`} whileTap={{ scale: 0.98 }}>
-                        <input type="radio" checked={method === m.id} onChange={() => setMethod(m.id)} />
-                        <span className="method-ico"><Icon name={m.ico} size={22} /></span>
-                        <div><b>{m.label}</b><div className="muted small">{m.sub}</div></div>
-                        {method === m.id && <motion.span layoutId="method-check" className="method-check"><Icon name="Check" size={13} stroke={3} /></motion.span>}
-                      </motion.label>
-                    ))}
-                  </div>
-                  <p className="small muted">All amounts are charged in Naira (NGN). Oja never stores your card details.</p>
-                  <div className="row-gap"><button className="btn btn-ghost" onClick={() => setStep(0)}>Back</button><button className="btn btn-primary lg" onClick={() => setStep(2)}>Review order</button></div>
-                </motion.section>
-              )}
-              {step === 2 && (
-                <motion.section key="s2" className="panel" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}>
-                  <h3>Review & pay</h3>
+                  <h3>Review your order</h3>
                   <div className="review-block"><div className="muted small">Deliver to</div><b>{addr.name}</b> · {addr.phone}<div>{addr.line}, {addr.state}</div><button className="link small" onClick={() => setStep(0)}>Change</button></div>
-                  <div className="review-block"><div className="muted small">Pay with</div><b>{METHODS.find((m) => m.id === method).label}</b><button className="link small" onClick={() => setStep(1)}>Change</button></div>
                   <ul className="review-items">
                     {t.lines.map((l) => (
                       <li key={l.key}><ProductArt p={l.p} size="xs" /><span className="clamp1">{l.qty} × {l.p.title}</span><b>{naira(l.p.price * l.qty)}</b></li>
                     ))}
                   </ul>
                   <div className="disclosure"><Icon name="CircleCheck" size={16} className="inline" /> The total below is the <b>final amount</b>. It already includes international freight, customs duties and clearing. No charges on delivery.</div>
-                  <div className="row-gap"><button className="btn btn-ghost" onClick={() => setStep(1)}>Back</button>
-                    <motion.button whileTap={{ scale: 0.97 }} className="btn btn-accent lg" disabled={paying} onClick={() => setPaying(true)}>Pay {naira(t.total)}</motion.button>
+                  <div className="row-gap"><button className="btn btn-ghost" onClick={() => setStep(0)}>Back</button>
+                    <motion.button whileTap={{ scale: 0.97 }} className="btn btn-accent lg" disabled={paying} onClick={() => setChoosing(true)}>Continue to payment · {naira(t.total)}</motion.button>
                   </div>
                   <div className="small muted">Order reference: <code>{idem.current}</code></div>
                 </motion.section>
@@ -187,10 +206,11 @@ export default function Checkout() {
             </AnimatePresence>
           </div>
           <aside className="cart-side">
-            <Summary t={t}>{step < 2 && <CouponBox />}</Summary>
+            <Summary t={t}><CouponBox /></Summary>
           </aside>
         </div>
       </div>
+      <AnimatePresence>{choosing && <PaymentChooser method={method} setMethod={setMethod} total={t.total} onCancel={() => setChoosing(false)} onPay={() => { setChoosing(false); setPaying(true) }} />}</AnimatePresence>
       <AnimatePresence>{paying && <PaymentFlow method={method} total={t.total} onDone={finish} />}</AnimatePresence>
     </Page>
   )

@@ -1353,3 +1353,12 @@ section { margin-top: 40px; }
 .set-confirm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .set-confirm span { margin-right: 6px; }
 @media (max-width: 900px) { .set-cards { grid-template-columns: minmax(0, 1fr); } }
+
+/* Checkout: payment chooser pop-up (after the review step) */
+.modal.pay-choose { width: min(620px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; display: grid; gap: 14px; }
+.pay-choose-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.pay-choose-head h3 { font-size: 22px; }
+.pay-choose-head p { margin: 2px 0 0; }
+.pay-choose > p { margin: 0; }
+.pay-choose-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+@media (max-width: 560px) { .pay-choose .methods { grid-template-columns: 1fr; } .pay-choose-actions .btn { flex: 1; } }
