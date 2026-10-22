@@ -368,7 +368,7 @@ export function Footer() {
               </a>
             ))}
           </div>
-          <p className="footer-tagline">From Asia, Europe, America to your doorstep, we handle every step.</p>
+          <div className="footer-promo"><p>From Asia, Europe, America to your doorstep, we handle every step.</p></div>
         </div>
       </div>
 

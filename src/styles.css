@@ -653,7 +653,7 @@ section { margin-top: 40px; }
 /* ---------- Footer ---------- */
 .footer { background: #071631; color: #c3cce0; padding: 52px 0 28px; margin-top: 40px; }
 .footer h4 { color: #fff; font-size: 17px; margin-bottom: 16px; }
-.footer-top { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: 32px; }
+.footer-top { display: grid; grid-template-columns: 1.25fr 1fr 0.9fr 1.55fr; gap: 32px; }
 .footer-col a { display: block; padding: 6px 0; font-size: 15px; color: #c3cce0; transition: color .15s; }
 .footer-col a:hover { color: #fff; }
 .socials { display: flex; gap: 18px; flex-wrap: wrap; }
@@ -1354,4 +1354,13 @@ section { margin-top: 40px; }
 @media (max-width: 560px) { .pay-choose .methods { grid-template-columns: 1fr; } .pay-choose-actions .btn { flex: 1; } }
 .flash-in-explore { margin-bottom: 26px; }
 
-.footer-tagline { margin: 18px 0 0; max-width: 300px; font-family: var(--display); font-size: 17px; font-weight: 700; line-height: 1.35; color: #fff; }
+.footer-promo {
+  position: relative; margin-top: 20px; min-height: 132px; display: flex; align-items: center;
+  padding: 18px 20px; border-radius: 12px; border: 2px solid rgba(255, 255, 255, .55); overflow: hidden;
+  /* doorstep hand-over photo from Unsplash (free licence), faded into black on the left for the text */
+  background: linear-gradient(90deg, #000 0%, rgba(0, 0, 0, .9) 34%, rgba(0, 0, 0, .25) 62%, rgba(0, 0, 0, 0) 85%),
+    url('https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=720&h=320&q=70') 70% 45% / cover no-repeat, #111;
+}
+.footer-promo p { margin: 0; max-width: 62%; color: #fff; font-family: var(--display); font-size: 17px; font-weight: 700; line-height: 1.35; }
+@media (max-width: 1100px) { .footer-promo { max-width: 560px; } .footer-promo p { max-width: 55%; font-size: 19px; } }
+@media (max-width: 560px) { .footer-promo p { max-width: 64%; font-size: 16px; } }
