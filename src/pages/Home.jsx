@@ -160,7 +160,7 @@ function Journey() {
 }
 
 // "Oja Week" product feed: left-aligned heading, category pills, 5-up grid
-function ExploreInterests({ feed, live, personalised }) {
+function ExploreInterests({ feed, live, personalised, children }) {
   const [tab, setTab] = useState('rec')
   const [count, setCount] = useState(15)
   const pills = useRef(null)
@@ -182,6 +182,7 @@ function ExploreInterests({ feed, live, personalised }) {
         </div>
         <button className="pill-arrow" onClick={() => scrollPills(1)} aria-label="More categories"><Icon name="ChevronRight" size={18} /></button>
       </div>
+      {children /* Flash deals sit between the category pills and the product grid */}
       {products.length ? <Grid products={products.slice(0, count)} className="grid-5" /> : <p className="muted">No products in this category yet.</p>}
       {count < products.length && (
         <div className="center"><motion.button whileTap={{ scale: 0.96 }} className="btn btn-ghost" onClick={() => setCount((n) => n + 15)}>Show more</motion.button></div>
@@ -212,19 +213,17 @@ export default function Home() {
 
         <TrustStrip />
 
-        <ExploreInterests feed={feed} live={live} personalised={personalised} />
+        <ExploreInterests feed={feed} live={live} personalised={personalised}>
+          <section className="flash flash-in-explore">
+            <SectionHead kicker="Ends tonight" title={<span className="row-ico"><Icon name="Zap" size={24} className="accent" fill="currentColor" /> Flash deals</span>} to="/deals">
+              <span className="muted small">Ends in</span> <Countdown to={flashEnds} />
+            </SectionHead>
+            <Rail products={deals.slice(0, 10)} />
+          </section>
+        </ExploreInterests>
       </div>
 
       <Journey />
-
-      <div className="wrap">
-        <section className="flash">
-          <SectionHead kicker="Ends tonight" title={<span className="row-ico"><Icon name="Zap" size={24} className="accent" fill="currentColor" /> Flash deals</span>} to="/deals">
-            <span className="muted small">Ends in</span> <Countdown to={flashEnds} />
-          </SectionHead>
-          <Rail products={deals.slice(0, 10)} />
-        </section>
-      </div>
     </Page>
   )
 }

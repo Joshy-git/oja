@@ -1362,3 +1362,4 @@ section { margin-top: 40px; }
 .pay-choose > p { margin: 0; }
 .pay-choose-actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 @media (max-width: 560px) { .pay-choose .methods { grid-template-columns: 1fr; } .pay-choose-actions .btn { flex: 1; } }
+.flash-in-explore { margin-bottom: 26px; }
