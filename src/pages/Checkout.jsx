@@ -200,7 +200,7 @@ export default function Checkout() {
                   <div className="row-gap"><button className="btn btn-ghost" onClick={() => setStep(0)}>Back</button>
                     <motion.button whileTap={{ scale: 0.97 }} className="btn btn-accent lg" disabled={paying} onClick={() => setChoosing(true)}>Continue to payment · {naira(t.total)}</motion.button>
                   </div>
-                  <div className="small muted">Order reference: <code>{idem.current}</code></div>
+                  <div className="small muted order-ref-line">Order reference: <code>{idem.current}</code></div>
                 </motion.section>
               )}
             </AnimatePresence>
