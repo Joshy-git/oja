@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useCallback } from 'react'
 import { PRODUCTS, productById, registerProduct, patchProduct, catId } from '../data/catalog'
 import { makeOrderRef, stagesFor } from '../lib/commerce'
+import { showToast } from '../components/toast'
 
 const KEY = 'ooja-state-v1'
 const H = 3600000
@@ -40,7 +41,6 @@ const initial = {
   audit: [],
   customProducts: [], // products added in the dashboard (form inputs; rebuilt on load)
   admin: {}, // dashboard choices: case statuses, paused coupons, review moderation, settings
-  toasts: [],
 }
 
 function load() {
@@ -50,7 +50,8 @@ function load() {
     const saved = JSON.parse(raw)
     ;(saved.customProducts || []).forEach(registerProduct)
     Object.entries(saved.catalog || {}).forEach(([id, patch]) => { if (patch.category) patch.category = catId(patch.category); patchProduct(id, patch) })
-    return { ...initial, ...saved, toasts: [], authOpen: false }
+    const { toasts, ...rest } = saved // eslint-disable-line no-unused-vars
+    return { ...initial, ...rest, authOpen: false }
   } catch { return initial }
 }
 
@@ -133,8 +134,6 @@ function reducer(s, a) {
       catalog: { ...s.catalog, [a.id]: { ...s.catalog[a.id], ...a.patch } },
       audit: [{ at: Date.now(), actor: 'Super Admin', action: `${a.id}: ${Object.entries(a.patch).map(([k, v]) => `${k} → ${v}`).join(', ')}` }, ...s.audit].slice(0, 100),
     }
-    case 'toast': return { ...s, toasts: [...s.toasts, a.toast] }
-    case 'dismissToast': return { ...s, toasts: s.toasts.filter((t) => t.id !== a.id) }
     // Clears dashboard-only choices (coupons, POs, shipments…) but keeps the keys listed in `keep`
     case 'resetAdmin': return { ...s, admin: Object.fromEntries(Object.entries(s.admin).filter(([k]) => (a.keep || []).includes(k) || k.endsWith('View'))), audit: [{ at: Date.now(), actor: 'Super Admin', action: 'Reset dashboard changes (settings kept)' }, ...s.audit].slice(0, 100) }
     case 'reset': return { ...initial, orders: seedOrders() }
@@ -148,14 +147,10 @@ export function StoreProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, undefined, load)
 
   useEffect(() => {
-    try { const { toasts, authOpen, ...persist } = state; localStorage.setItem(KEY, JSON.stringify(persist)) } catch {}
+    try { const { authOpen, ...persist } = state; localStorage.setItem(KEY, JSON.stringify(persist)) } catch {}
   }, [state])
 
-  const toast = useCallback((msg, opts = {}) => {
-    const id = Math.random().toString(36).slice(2)
-    dispatch({ type: 'toast', toast: { id, msg, ...opts } })
-    setTimeout(() => dispatch({ type: 'dismissToast', id }), opts.ms || 2600)
-  }, [])
+  const toast = useCallback((msg, opts = {}) => showToast(msg, opts), [])
 
   // Merge admin-controlled catalog fields (price/stock/publish) into products
   // Visibility: scheduled products go live once their publish date has passed

@@ -176,7 +176,7 @@ export function AuthModal() {
                       <label className="auth-field"><span>Full name</span><input id="auth-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Ada Okafor" /></label>
                     </>
                   )}
-                  <button className="btn btn-primary lg block" disabled={!valid || (isNew && !name.trim())}>{isNew ? 'Create account' : 'Send code'}</button>
+                  <button className="btn btn-primary lg btn-block" disabled={!valid || (isNew && !name.trim())}>{isNew ? 'Create account' : 'Send code'}</button>
                 </motion.form>
               )}
 
@@ -186,7 +186,7 @@ export function AuthModal() {
                   <p className="muted">We sent a 6-digit code to <b className="ink">{sentTo}</b>.</p>
                   <input id="auth-otp" className="otp auth-otp" autoFocus maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} placeholder="••••••" inputMode="numeric" autoComplete="one-time-code" aria-label="6-digit code" />
                   {otp.length === 6 && otp !== code && <div className="err small">That code doesn't match. Check the latest code and try again.</div>}
-                  <button className="btn btn-primary lg block" disabled={otp.length !== 6}>{target?.draft ? 'Verify & create account' : 'Verify & sign in'}</button>
+                  <button className="btn btn-primary lg btn-block" disabled={otp.length !== 6}>{target?.draft ? 'Verify & create account' : 'Verify & sign in'}</button>
                   <button type="button" className="link auth-resend" onClick={() => sendCode(target)}>Send a new code</button>
                 </motion.form>
               )}

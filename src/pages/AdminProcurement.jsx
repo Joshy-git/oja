@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { ProductArt, spring } from '../components/ui'
+import { ProductArt, spring } from '../components/common'
 import { patchProduct } from '../data/catalog'
 import { naira } from '../lib/commerce'
 import { Menu, useOutside } from './AdminOrders'
@@ -296,13 +296,13 @@ function NewPOModal({ products, taken, onClose, onCreated }) {
             </label>
             {show('prod')}
             {p && <div className="rs-now"><span className="ord-thumb"><ProductArt p={p} size="xs" /></span><div className="small"><b>{p.supplier}</b><div className="muted">Minimum order {p.moq} units · {p.leadDays} days to make · {p.stock === 'oos' ? 0 : p.qty} in stock now</div></div></div>}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Units</span><input id="po-qty" type="number" min="1" inputMode="numeric" value={f.qty} onChange={set('qty')} placeholder="e.g. 200" /></label>
               <label className="set-field"><span>Unit cost (¥)</span><input id="po-unit" type="number" min="0" step="0.01" inputMode="decimal" value={f.unit} onChange={set('unit')} placeholder="e.g. 28.50" /></label>
             </div>
             {show('qty')}{show('unit')}
             {p && qty > 0 && qty < p.moq && <p className="small po-warn"><Icon name="TriangleAlert" size={14} /> Below the supplier’s minimum of {p.moq} units, so they may refuse or charge more.</p>}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Payment terms</span><select id="po-terms" value={f.terms} onChange={set('terms')}>{TERMS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
               <label className="set-field"><span>Expected ready date</span><input id="po-due" type="date" value={f.due} onChange={set('due')} /></label>
             </div>

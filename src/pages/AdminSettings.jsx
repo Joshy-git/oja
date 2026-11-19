@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { spring } from '../components/ui'
+import { spring } from '../components/common'
 import { FREE_SHIP_THRESHOLD, naira } from '../lib/commerce'
 
 export const DEFAULT_SETTINGS = { storeName: 'Oja', supportHours: '8am – 9pm daily', supportEmail: 'support@oja.africa', supportPhone: '0700 652 0000', minMargin: 15, lowStock: 100, alertCustoms: true, alertLowStock: true, alertCases: true, dailySummary: false }
@@ -83,14 +83,14 @@ export default function Settings({ edit }) {
         <div className="set-cards">
           <div className="adm-card">
             <div className="card-head"><div><h4>Store profile</h4><p className="muted small">Shown to shoppers in the help centre and order emails</p></div></div>
-            <div className="pe-2">
+            <div className="pe-cols2">
               {field('storeName', 'Store name')}
               <label className="set-field"><span>Currency</span><input value="Nigerian naira (₦)" disabled /><small className="muted">Prices across the store are in naira.</small></label>
             </div>
           </div>
           <div className="adm-card">
             <div className="card-head"><div><h4>Customer support</h4><p className="muted small">How shoppers reach you</p></div></div>
-            <div className="pe-2">
+            <div className="pe-cols2">
               {field('supportEmail', 'Support email', { type: 'email' })}
               {field('supportPhone', 'Support phone', { inputMode: 'tel' })}
             </div>
@@ -103,14 +103,14 @@ export default function Settings({ edit }) {
         <div className="set-cards">
           <div className="adm-card">
             <div className="card-head"><div><h4>Pricing guardrails</h4><p className="muted small">Checks the dashboard runs before you save</p></div></div>
-            <div className="pe-2">
+            <div className="pe-cols2">
               {field('minMargin', 'Minimum margin (%)', { type: 'number', min: 0, max: 80, step: 0.5 }, 'Product prices can’t be saved below this margin.')}
               {field('lowStock', 'Low stock below (units)', { type: 'number', min: 1, step: 1 }, 'Used by Inventory, Products and the bell alerts.')}
             </div>
           </div>
           <div className="adm-card">
             <div className="card-head"><div><h4>Delivery</h4><p className="muted small">Set in the storefront for now</p></div></div>
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Free delivery from</span><input value={naira(FREE_SHIP_THRESHOLD)} disabled /></label>
               <label className="set-field"><span>Lagos pickup point</span><input value="Ikeja warehouse" disabled /></label>
             </div>

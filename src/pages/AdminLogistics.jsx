@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { spring } from '../components/ui'
+import { spring } from '../components/common'
 import { Menu, useOutside } from './AdminOrders'
 
 const DAY = 864e5
@@ -277,16 +277,16 @@ function NewShipmentModal({ taken, onClose, onCreated }) {
         </div>
         <div className="co-body">
           <section className="co-sec">
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>From</span><select id="ns-origin" value={f.origin} onChange={set('origin')}>{Object.entries(ORIGINS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
               <label className="set-field"><span>Freight</span><select id="ns-mode" value={f.mode} onChange={set('mode')}><option value="Air">Air → {PORT.Air}</option><option value="Sea">Sea → {PORT.Sea}</option></select></label>
             </div>
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Carrier</span><select id="ns-carrier" value={f.carrier} onChange={set('carrier')}>{CARRIERS[f.mode].map((c) => <option key={c}>{c}</option>)}</select></label>
               <label className="set-field"><span>Expected arrival</span><input id="ns-eta" type="date" value={f.eta} onChange={set('eta')} /></label>
             </div>
             {show('eta')}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Units</span><input id="ns-units" type="number" min="1" inputMode="numeric" value={f.units} onChange={set('units')} placeholder="e.g. 450" /></label>
               <label className="set-field"><span>Customer orders <em className="muted">optional</em></span><input id="ns-orders" type="number" min="0" inputMode="numeric" value={f.orders} onChange={set('orders')} placeholder="e.g. 120" /></label>
             </div>

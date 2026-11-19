@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { spring } from '../components/ui'
+import { spring } from '../components/common'
 import { Menu, useOutside } from './AdminOrders'
 
 const HOUR = 36e5
@@ -256,12 +256,12 @@ function InviteModal({ roles, canEdit, taken, onClose, onInvited }) {
         </div>
         <div className="co-body">
           <section className="co-sec">
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Full name</span><input id="iv-name" value={f.name} onChange={set('name')} placeholder="Chidi Okeke" autoComplete="off" autoFocus /></label>
               <label className="set-field"><span>Work email</span><input id="iv-email" type="email" value={f.email} onChange={set('email')} placeholder="chidi@oja.africa" autoComplete="off" /></label>
             </div>
             {show('name')}{show('email')}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Role</span><select id="iv-role" value={f.role} onChange={set('role')}>{Object.keys(roles).map((r) => <option key={r}>{r}</option>)}</select></label>
               <label className="set-field"><span>Location</span><select id="iv-city" value={f.city} onChange={set('city')}>{CITIES.map((c) => <option key={c}>{c}</option>)}</select></label>
             </div>

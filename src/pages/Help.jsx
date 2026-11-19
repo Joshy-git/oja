@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store/Store'
-import { Page, Reveal } from '../components/ui'
+import { Page, Reveal } from '../components/common'
 import { naira, FREE_SHIP_THRESHOLD } from '../lib/commerce'
 import { Icon } from '../components/Icon'
 

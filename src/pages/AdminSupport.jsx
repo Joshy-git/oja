@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { spring } from '../components/ui'
+import { spring } from '../components/common'
 import { Menu, useOutside } from './AdminOrders'
 
 const DAY = 864e5
@@ -266,19 +266,19 @@ function NewCaseModal({ orders, onClose, onCreated }) {
           <section className="co-sec">
             <h4>Customer</h4>
             {orders.length > 0 && <label className="set-field"><span>Related order <em className="muted">optional</em></span><select id="nc-order" value={orders.some((o) => o.ref === f.order) ? f.order : ''} onChange={(e) => pickOrder(e.target.value)}><option value="">No order / type it below</option>{orders.slice(0, 30).map((o) => <option key={o.ref} value={o.ref}>{o.ref} · {o.address.name}</option>)}</select></label>}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Full name</span><input id="nc-name" value={f.name} onChange={set('name')} placeholder="Ada Okafor" autoComplete="off" autoFocus /></label>
               <label className="set-field"><span>Phone</span><input id="nc-phone" value={f.phone} onChange={set('phone')} placeholder="0803 123 4567" inputMode="tel" autoComplete="off" /></label>
             </div>
             {show('name')}{show('phone')}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Reported via</span><select id="nc-channel" value={f.channel} onChange={set('channel')}>{CHANNELS.filter((x) => x !== 'Help page').map((x) => <option key={x}>{x}</option>)}</select></label>
               {!orders.some((o) => o.ref === f.order) ? <label className="set-field"><span>Order number <em className="muted">optional</em></span><input id="nc-ordertext" value={f.order} onChange={set('order')} placeholder="OJ-261004-ABC12" autoComplete="off" /></label> : <span />}
             </div>
           </section>
           <section className="co-sec">
             <h4>Problem</h4>
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Issue</span><select id="nc-type" value={f.type} onChange={set('type')}><option value="">Choose…</option>{Object.entries(CASE_TYPES).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
               <label className="set-field"><span>Priority</span><select id="nc-priority" value={priority} onChange={set('priority')}><option>High</option><option>Normal</option></select></label>
             </div>

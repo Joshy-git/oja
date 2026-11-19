@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { spring } from '../components/ui'
+import { spring } from '../components/common'
 import { naira } from '../lib/commerce'
 import { Menu, useOutside } from './AdminOrders'
 
@@ -240,12 +240,12 @@ function AddCustomerModal({ onClose, onAdded, taken }) {
         </div>
         <div className="co-body">
           <section className="co-sec">
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Full name</span><input id="ac-name" value={f.name} onChange={set('name')} placeholder="Ada Okafor" autoComplete="off" autoFocus /></label>
               <label className="set-field"><span>Phone</span><input id="ac-phone" value={f.phone} onChange={set('phone')} placeholder="0803 123 4567" inputMode="tel" autoComplete="off" /></label>
             </div>
             {show('name')}{show('phone')}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>City</span><input id="ac-city" value={f.city} onChange={set('city')} placeholder="Lagos" /></label>
               <label className="set-field"><span>Country</span><select id="ac-country" value={f.country} onChange={set('country')}>{COUNTRIES.map((x) => <option key={x}>{x}</option>)}</select></label>
             </div>

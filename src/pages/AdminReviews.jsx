@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { ProductArt, Stars, spring } from '../components/ui'
+import { ProductArt, Stars, spring } from '../components/common'
 import { CATEGORIES, reviewsFor } from '../data/catalog'
 import { Menu, useOutside } from './AdminOrders'
 

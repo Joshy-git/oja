@@ -1,0 +1,130 @@
+/* Oja global stylesheet: Tailwind setup, design tokens and the few global styles
+   Tailwind can't express. Component styling lives in the JSX as utility classes. */
+@layer theme, base, legacy-compat, legacy, components, utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./styles.css" layer(legacy);
+@import "./legacy-compat.css" layer(legacy-compat);
+
+@custom-variant touch (@media (hover: none));
+/* The app is light-only: dark: styles only apply under an explicit .dark class */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* shadcn/ui semantic tokens, mapped onto the Oja palette */
+:root {
+  --radius: 0.5rem;
+  --background: #f5f7fb;
+  --foreground: #0f1a2e;
+  --card: #ffffff;
+  --card-foreground: #0f1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #0f1a2e;
+  --primary: #0b2045;
+  --primary-foreground: #ffffff;
+  --secondary: #e9ecf2;
+  --secondary-foreground: #45506a;
+  --muted: #f5f7fb;
+  --muted-foreground: #77819a;
+  --accent: #f5f7fb;
+  --accent-foreground: #0f1a2e;
+  --destructive: #d64545;
+  --border: #e6e9f0;
+  --input: #e6e9f0;
+  --ring: #0b2045;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Oja brand palette and type */
+@theme {
+  --color-brand: #0b2045;
+  --color-brand-2: #1b3a75;
+  --color-brand-tint: #e8edf7;
+  --color-brand-ink: #071631;
+  --color-orange: #ff7a2e;
+  --color-orange-2: #ff9555;
+  --color-sun: #ffc93c;
+  --color-ink: #0f1a2e;
+  --color-ink-2: #45506a;
+  --color-line: #e6e9f0;
+  --color-good: #128a57;
+  --color-bad: #d64545;
+  --color-warn: #c77700;
+  --color-info: #2a6fdb;
+  --color-adm-bg: #f6f7f9;
+  --color-adm-line: #e7e9ee;
+  --color-good-tint: #e5f5ec;
+  --color-good-ink: #0e7044;
+  --color-info-tint: #e8f0fd;
+  --color-info-ink: #2459b8;
+  --color-warn-tint: #fff3dc;
+  --color-warn-ink: #9a5c00;
+  --color-bad-tint: #fde8e8;
+  --color-bad-ink: #b23333;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-script: 'Yellowtail', cursive;
+
+  --shadow-card: 0 1px 2px rgba(11, 32, 69, .05), 0 6px 18px rgba(11, 32, 69, .06);
+  --shadow-lift: 0 18px 50px rgba(11, 32, 69, .16);
+
+  /* Desktop-first breakpoints the design was built on (use max-*: variants) */
+  --breakpoint-xs: 35rem;   /* 560px */
+  --breakpoint-sm: 40rem;   /* 640px */
+  --breakpoint-md: 56.25rem; /* 900px */
+  --breakpoint-lg: 68.75rem; /* 1100px */
+  --breakpoint-xl: 80rem;   /* 1280px */
+
+  --animate-marquee: marquee 40s linear infinite;
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  --animate-sale-spin: sale-spin 80s linear infinite;
+  @keyframes sale-spin { to { transform: rotate(360deg); } }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* Global defaults the whole app is designed on */
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; font-family: var(--font-sans); color: var(--color-ink); background: var(--background);
+    font-size: 15px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  @media (max-width: 640px) { body { font-size: 14.5px; } }
+  button:not(:disabled), [role='button']:not(:disabled) { cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: .5; }
+  input::placeholder, textarea::placeholder { color: #757575; }
+  h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.15; letter-spacing: -.01em; }
+  h1 { font-size: clamp(24px, 3vw, 32px); font-weight: 800; }
+  h2 { font-size: clamp(20px, 2.4vw, 26px); font-weight: 700; }
+  h3 { font-size: 19px; font-weight: 700; margin-bottom: 12px; }
+  h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+}

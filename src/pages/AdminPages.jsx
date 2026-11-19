@@ -160,17 +160,17 @@ function CreatePromotionModal({ taken, onClose }) {
               <button type="button" className={kind === 'campaign' ? 'on' : ''} onClick={() => { setKind('campaign'); setTried(false) }}><Icon name="Zap" size={14} /> Campaign</button>
             </div>
             {kind === 'coupon' ? (<>
-              <div className="pe-2">
+              <div className="pe-cols2">
                 <label className="set-field"><span>Code</span><input id="cp-code" value={f.code} onChange={set('code')} placeholder="e.g. AFRICA15" autoComplete="off" autoFocus /></label>
                 <label className="set-field"><span>Discount</span><select id="cp-type" value={f.type} onChange={set('type')}><option value="percent">Percentage off</option><option value="flat">Fixed amount off</option><option value="ship">Free delivery</option></select></label>
               </div>
               {show('code')}
-              {f.type !== 'ship' && <div className="pe-2">
+              {f.type !== 'ship' && <div className="pe-cols2">
                 <label className="set-field"><span>{f.type === 'percent' ? 'Percentage (%)' : 'Amount (₦)'}</span><input id="cp-value" type="number" min="1" inputMode="numeric" value={f.value} onChange={set('value')} /></label>
                 {f.type === 'percent' ? <label className="set-field"><span>Max discount (₦) <em className="muted">optional</em></span><input id="cp-cap" type="number" min="0" inputMode="numeric" value={f.cap} onChange={set('cap')} placeholder="No cap" /></label> : <span />}
               </div>}
               {show('value')}{show('cap')}
-              <div className="pe-2">
+              <div className="pe-cols2">
                 <label className="set-field"><span>Minimum order (₦)</span><input id="cp-min" type="number" min="0" inputMode="numeric" value={f.min} onChange={set('min')} placeholder="0" /></label>
                 <label className="set-field cp-check"><span>Who can use it</span><select value={f.firstOrder ? 'first' : 'all'} onChange={(e) => setF({ ...f, firstOrder: e.target.value === 'first' })}><option value="all">Every shopper</option><option value="first">First order only</option></select></label>
               </div>
@@ -184,7 +184,7 @@ function CreatePromotionModal({ taken, onClose }) {
               </div>
               {show('where')}
             </>)}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Starts</span><input id="cp-dates" type="date" value={f.start} onChange={set('start')} /></label>
               <label className="set-field"><span>Ends</span><input type="date" value={f.end} onChange={set('end')} /></label>
             </div>

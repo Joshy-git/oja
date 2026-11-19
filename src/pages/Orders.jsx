@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
-import { Page, Empty, Reveal, ProductArt } from '../components/ui'
+import { Page, Empty, Reveal, ProductArt } from '../components/common'
 import { naira, stagesFor } from '../lib/commerce'
 import { Icon } from '../components/Icon'
 

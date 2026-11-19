@@ -4,15 +4,19 @@ import { motion, AnimatePresence, useAnimationControls } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { autocomplete, STATES } from '../lib/commerce'
 import { CATEGORIES, SUGGESTED_QUERIES } from '../data/catalog'
+import { cn } from '@/lib/utils'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import footerWarehouse from '../assets/footer-warehouse.webp'
 import { Icon } from './Icon'
-import { ProductArt } from './ui'
+import { ProductArt, wrap, linkCls, chipCls as chip } from './common'
 
 // "oja AFRICA" wordmark, redrawn from the brand logo. Letters use currentColor
 // so the light variant turns white; the tilted square is always brand orange.
-export function Logo({ light, tagline }) {
+export function Logo({ light, tagline, className, linkClassName }) {
   return (
-    <Link to="/" className={`logo ${light ? 'logo-light' : ''} ${tagline ? 'logo-tagline' : ''}`} aria-label="Oja Africa home">
-      <svg viewBox={tagline ? '250 135 780 565' : '250 135 780 465'} aria-hidden>
+    <Link to="/" className={cn('inline-flex items-center leading-[0] text-brand', light && 'text-white', linkClassName)} aria-label="Oja Africa home">
+      <svg viewBox={tagline ? '250 135 780 565' : '250 135 780 465'} className={cn('block h-[34px] w-auto', tagline && 'h-14', className)} aria-hidden>
         <g fill="none" stroke="currentColor" strokeWidth="76">
           <ellipse cx="412" cy="388" rx="116" ry="108" />
           <ellipse cx="860" cy="386" rx="122" ry="111" />
@@ -20,7 +24,7 @@ export function Logo({ light, tagline }) {
         </g>
         <path fill="currentColor" d="M599 300 V270 Q599 261 608 259 L661 247 Q675 244 675 258 V300 Z" />
         <path fill="currentColor" d="M945 386 H1022 V517 Q1022 527 1012 527 H955 Q945 527 945 517 Z" />
-        <rect fill="var(--accent)" x="-44" y="-40" width="88" height="80" rx="15" transform="translate(640 190) rotate(-13)" />
+        <rect fill="var(--color-orange)" x="-44" y="-40" width="88" height="80" rx="15" transform="translate(640 190) rotate(-13)" />
         {tagline && (
           <text x="647" y="688" textAnchor="middle" textLength="518" lengthAdjust="spacing" fill="currentColor"
             fontFamily="Inter, system-ui, sans-serif" fontWeight="700" fontSize="66">AFRICA</text>
@@ -48,91 +52,79 @@ const LANGUAGES = [
   { id: 'ha', code: 'HA', name: 'Hausa', flag: 'ng' },
   { id: 'yo', code: 'YO', name: 'Yorùbá', flag: 'ng' },
 ]
-const Flag = ({ id }) => <svg className="flag" viewBox="0 0 24 16" width="24" height="16" aria-hidden>{FLAGS[id]}</svg>
+const Flag = ({ id }) => <svg className="shrink-0 rounded-[2px] shadow-[0_0_0_1px_rgba(11,32,69,.12)]" viewBox="0 0 24 16" width="24" height="16" aria-hidden>{FLAGS[id]}</svg>
 
 function LanguagePicker() {
   const { state, dispatch, toast } = useStore()
-  const [open, setOpen] = useState(false)
-  const ref = useRef(null)
   const current = LANGUAGES.find((l) => l.id === state.language) || LANGUAGES[0]
-  useEffect(() => {
-    if (!open) return
-    const close = (e) => { if (!ref.current?.contains(e.target)) setOpen(false) }
-    const esc = (e) => { if (e.key === 'Escape') setOpen(false) }
-    document.addEventListener('pointerdown', close)
-    document.addEventListener('keydown', esc)
-    return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', esc) }
-  }, [open])
   const pick = (l) => {
-    setOpen(false)
     if (l.id === current.id) return
     dispatch({ type: 'setLanguage', language: l.id })
     if (l.id !== 'en') toast(`${l.name} saved. Translation is coming soon, so the site shows in English for now.`, { icon: 'Bell', ms: 4000 })
   }
   return (
-    <div className="lang" ref={ref}>
-      <button className="lang-btn" onClick={() => setOpen((o) => !o)} aria-haspopup="listbox" aria-expanded={open} aria-label={`Language: ${current.name}`}>
-        <Flag id={current.flag} /><span>{current.code}</span><svg className="lang-caret" viewBox="0 0 10 6" width="10" height="6" aria-hidden><path d="M0 0h10L5 6z" fill="currentColor" /></svg>
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.ul className="lang-pop" role="listbox" aria-label="Choose language" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
-            {LANGUAGES.map((l) => (
-              <li key={l.id}>
-                <button role="option" aria-selected={l.id === current.id} className={l.id === current.id ? 'on' : ''} onClick={() => pick(l)}>
-                  <Flag id={l.flag} /><span className="lang-name">{l.name}</span><span className="lang-code">{l.code}</span>
-                  {l.id === current.id && <Icon name="Check" size={15} />}
-                </button>
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
+    <div className="relative flex items-center">
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger className="group inline-flex items-center gap-[7px] rounded-lg px-2.5 py-2 text-[14px] font-bold text-ink outline-none hover:bg-background hover:text-brand focus-visible:ring-2 focus-visible:ring-brand-tint data-[state=open]:bg-background data-[state=open]:text-brand max-sm:gap-[5px] max-sm:px-1.5" aria-label={`Language: ${current.name}`}>
+          <Flag id={current.flag} /><span className="max-sm:hidden">{current.code}</span>
+          <svg className="text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-180" viewBox="0 0 10 6" width="10" height="6" aria-hidden><path d="M0 0h10L5 6z" fill="currentColor" /></svg>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" sideOffset={6} aria-label="Choose language" className="z-70 min-w-[210px] rounded-lg border-line p-1.5 shadow-lift">
+          {LANGUAGES.map((l) => {
+            const on = l.id === current.id
+            return (
+              <DropdownMenuItem key={l.id} onSelect={() => pick(l)} aria-current={on || undefined}
+                className={cn('gap-2.5 rounded-md px-2.5 py-[9px] text-[14px] text-ink', on && 'bg-brand-tint font-semibold text-brand focus:bg-brand-tint focus:text-brand')}>
+                <Flag id={l.flag} /><span className="flex-1">{l.name}</span><span className="text-[12px] font-semibold text-muted-foreground">{l.code}</span>
+                {on && <Icon name="Check" size={15} className="text-brand" />}
+              </DropdownMenuItem>
+            )
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
 
+const catlink = 'inline-flex items-center gap-[5px] whitespace-nowrap rounded-full px-3 py-1.5 text-[13.5px] font-medium text-ink-2 hover:bg-background hover:text-ink'
+const catlinkHot = 'inline-flex items-center gap-[5px] whitespace-nowrap rounded-full px-3 py-1.5 text-[13.5px] font-bold text-orange hover:bg-background'
+
 function AllCategories() {
   const { live } = useStore()
   const [open, setOpen] = useState(false)
-  const ref = useRef(null)
   const loc = useLocation()
   useEffect(() => { setOpen(false) }, [loc.pathname, loc.search])
-  useEffect(() => {
-    if (!open) return
-    const close = (e) => { if (!ref.current?.contains(e.target)) setOpen(false) }
-    const esc = (e) => { if (e.key === 'Escape') setOpen(false) }
-    document.addEventListener('pointerdown', close)
-    document.addEventListener('keydown', esc)
-    return () => { document.removeEventListener('pointerdown', close); document.removeEventListener('keydown', esc) }
-  }, [open])
   const count = (id) => live.filter((p) => p.category === id).length
   return (
-    <div className="allcats" ref={ref}>
-      <button className={`allcats-btn ${open ? 'on' : ''}`} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-haspopup="true">
-        <Icon name="LayoutGrid" size={16} />All categories<Icon name="ChevronDown" size={16} className="allcats-caret" />
-      </button>
-      <AnimatePresence>
-        {open && (
-          <motion.div className="allcats-pop" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.15 }}>
-            <div className="allcats-grid">
-              {CATEGORIES.map((c) => (
-                <Link key={c.id} to={`/search?cat=${c.id}`} className="allcats-item">
-                  <span className="allcats-ico" style={{ '--h': c.hue }}><Icon name={c.icon} size={20} /></span>
-                  <span><b>{c.name}</b><small>{count(c.id)} products</small></span>
-                </Link>
-              ))}
-            </div>
-            <div className="allcats-foot">
-              <Link to="/deals" className="catlink hot"><Icon name="Zap" size={15} /> Flash deals</Link>
-              <Link to="/search" className="allcats-all">Browse all products <Icon name="ArrowRight" size={15} /></Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div className="shrink-0 border-r border-line pr-1.5">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger className="group inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-[13.5px] font-semibold text-ink transition-colors duration-150 hover:bg-background data-[state=open]:bg-brand-tint data-[state=open]:text-brand">
+          <Icon name="LayoutGrid" size={16} />All categories<Icon name="ChevronDown" size={16} className="text-muted-foreground transition-transform duration-150 group-data-[state=open]:rotate-180 group-data-[state=open]:text-brand" />
+        </PopoverTrigger>
+        <PopoverContent align="start" sideOffset={6} collisionPadding={12}
+          className="z-70 w-[min(760px,calc(100vw-40px))] rounded-lg border-line p-3.5 shadow-lift max-md:max-h-[70dvh] max-md:w-[calc(100vw-24px)] max-md:overflow-y-auto max-md:p-2.5">
+          <div className="grid grid-cols-3 gap-1 max-lg:grid-cols-2">
+            {CATEGORIES.map((c) => (
+              <Link key={c.id} to={`/search?cat=${c.id}`} className="group/item flex min-w-0 items-center gap-3 rounded-lg p-2.5 hover:bg-background max-md:gap-2 max-md:px-1.5 max-md:py-2">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[hsl(var(--h)_70%_94%)] text-[hsl(var(--h)_55%_34%)] max-md:size-[34px]" style={{ '--h': c.hue }}><Icon name={c.icon} size={20} /></span>
+                <span className="flex min-w-0 flex-col">
+                  <b className="truncate text-[14px] font-semibold text-ink group-hover/item:text-brand max-md:whitespace-normal max-md:text-[13px]">{c.name}</b>
+                  <small className="text-[12px] text-muted-foreground">{count(c.id)} products</small>
+                </span>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-2.5 flex items-center justify-between border-t border-line pt-2.5">
+            <Link to="/deals" className={catlinkHot}><Icon name="Zap" size={15} /> Flash deals</Link>
+            <Link to="/search" className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-brand underline-offset-3 hover:underline">Browse all products <Icon name="ArrowRight" size={15} /></Link>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }
+
+const suggHead = 'mb-2 mt-1.5 flex justify-between text-[12px] font-bold uppercase tracking-[.06em] text-muted-foreground'
 
 function SearchBox() {
   const { state, dispatch } = useStore()
@@ -169,10 +161,11 @@ function SearchBox() {
   }
 
   return (
-    <div className="search" ref={ref}>
-      <form onSubmit={(e) => { e.preventDefault(); go(q) }} className="search-form">
-        <span className="search-ico" aria-hidden>⌕</span>
+    <div className="relative min-w-0 flex-1 max-md:order-5 max-md:max-w-none max-md:basis-full" ref={ref}>
+      <form onSubmit={(e) => { e.preventDefault(); go(q) }} className="flex items-center rounded-full border-2 border-brand bg-background py-[3px] pl-4 pr-[3px]">
+        <span className="mr-1.5 text-[20px] text-muted-foreground" aria-hidden>⌕</span>
         <input
+          className="min-w-0 flex-1 border-0 bg-transparent py-2 outline-none"
           value={q}
           onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(-1) }}
           onFocus={() => setOpen(true)}
@@ -180,29 +173,29 @@ function SearchBox() {
           placeholder="Search power banks, bonnets, sneakers…"
           aria-label="Search products"
         />
-        <button className="search-btn" type="submit">Search</button>
+        <button className="rounded-full bg-brand px-[18px] py-2 font-semibold text-white" type="submit">Search</button>
       </form>
       <AnimatePresence>
         {open && (
-          <motion.div className="search-pop" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}>
+          <motion.div className="absolute inset-x-0 top-[calc(100%+8px)] z-60 rounded-lg bg-white p-2 shadow-lift" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}>
             {q.trim() ? (
               sugg.length ? sugg.map((s, i) => (
-                <button key={s.type + s.id} className={`sugg ${hi === i ? 'hi' : ''}`} onMouseEnter={() => setHi(i)} onClick={() => pick(s)}>
-                  <span className="sugg-ico">{s.type === 'product' ? <ProductArt p={s.product} size="xs" /> : <Icon name={s.icon} size={18} />}</span>
-                  <span className="sugg-label">{s.label}</span>
-                  <span className="sugg-type">{s.type === 'category' ? 'Category' : ''}</span>
+                <button key={s.type + s.id} className={cn('flex w-full items-center gap-2.5 rounded-lg px-2.5 py-[9px] text-left', hi === i && 'bg-background')} onMouseEnter={() => setHi(i)} onClick={() => pick(s)}>
+                  <span className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-lg bg-background text-brand">{s.type === 'product' ? <ProductArt p={s.product} size="xs" className="w-9 rounded-lg" /> : <Icon name={s.icon} size={18} />}</span>
+                  <span className="flex-1 text-[14px]">{s.label}</span>
+                  <span className="text-[12px] text-muted-foreground">{s.type === 'category' ? 'Category' : ''}</span>
                 </button>
-              )) : <div className="sugg-empty">Press Enter to search “{q}”</div>
+              )) : <div className="p-3 text-[14px] text-muted-foreground">Press Enter to search “{q}”</div>
             ) : (
-              <div className="sugg-chips">
+              <div className="p-1.5">
                 {state.searches.length > 0 && (
                   <>
-                    <div className="sugg-head">Recent <button className="link" onClick={() => dispatch({ type: 'clearSearches' })}>Clear</button></div>
-                    <div className="chips">{state.searches.map((s) => <button key={s} className="chip chip-ico" onClick={() => go(s)}><Icon name="History" size={13} /> {s}</button>)}</div>
+                    <div className={suggHead}>Recent <button className={linkCls} onClick={() => dispatch({ type: 'clearSearches' })}>Clear</button></div>
+                    <div className="flex flex-wrap gap-2">{state.searches.map((s) => <button key={s} className={cn(chip, 'inline-flex items-center gap-1')} onClick={() => go(s)}><Icon name="History" size={13} /> {s}</button>)}</div>
                   </>
                 )}
-                <div className="sugg-head"><span className="row-ico">Trending across Africa <Icon name="Flame" size={14} className="flame" /></span></div>
-                <div className="chips">{SUGGESTED_QUERIES.map((s) => <button key={s} className="chip" onClick={() => go(s)}>{s}</button>)}</div>
+                <div className={cn(suggHead, state.searches.length > 0 && 'mt-3.5')}><span className="inline-flex items-center gap-1.5">Trending across Africa <Icon name="Flame" size={14} className="text-orange" /></span></div>
+                <div className="flex flex-wrap gap-2">{SUGGESTED_QUERIES.map((s) => <button key={s} className={chip} onClick={() => go(s)}>{s}</button>)}</div>
               </div>
             )}
           </motion.div>
@@ -211,6 +204,9 @@ function SearchBox() {
     </div>
   )
 }
+
+const hbtn = 'group relative flex flex-col items-center rounded-lg px-2.5 py-1 text-[12px] font-semibold hover:bg-background'
+const hbtnIco = 'grid h-6 place-items-center leading-none text-ink group-hover:text-brand'
 
 function CartButton() {
   const { cartCount } = useStore()
@@ -221,12 +217,12 @@ function CartButton() {
     prev.current = cartCount
   }, [cartCount, ctl])
   return (
-    <Link to="/cart" className="hbtn" aria-label={`Cart, ${cartCount} items`}>
-      <motion.span animate={ctl} className="hbtn-ico"><Icon name="ShoppingCart" size={22} /></motion.span>
-      <span className="hbtn-label">Cart</span>
+    <Link to="/cart" className={hbtn} aria-label={`Cart, ${cartCount} items`}>
+      <motion.span animate={ctl} className={hbtnIco}><Icon name="ShoppingCart" size={22} /></motion.span>
+      <span className="max-md:hidden">Cart</span>
       <AnimatePresence>
         {cartCount > 0 && (
-          <motion.span key={cartCount} className="cart-count" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 500, damping: 18 }}>
+          <motion.span key={cartCount} className="absolute -top-0.5 right-0.5 grid h-[19px] min-w-[19px] place-items-center rounded-lg bg-orange px-[5px] text-[11px] font-bold text-white" initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }} transition={{ type: 'spring', stiffness: 500, damping: 18 }}>
             {cartCount}
           </motion.span>
         )}
@@ -235,48 +231,50 @@ function CartButton() {
   )
 }
 
+const PROMOS = [['Truck', <>Free delivery on orders above ₦50,000</>], ['Stamp', <>Import duties included — no surprise charges</>], ['Gift', <>New here? 10% off with <b className="text-sun">OJA10</b></>], ['Lock', <>Payments verified securely</>], ['RotateCcw', <>Easy returns on eligible items</>]]
+
 export function Header() {
   const { state, dispatch } = useStore()
   return (
-    <header className="header">
-      <div className="promo-strip">
-        <div className="marquee">
-          <div className="marquee-track">
+    <header className="tw sticky top-0 z-50 bg-white shadow-[0_1px_0_var(--color-line)]">
+      <div className="flex h-[30px] items-center overflow-hidden bg-brand-ink text-[12.5px] text-[#dbe4f5]">
+        <div className="w-full overflow-hidden">
+          <div className="flex w-max animate-marquee whitespace-nowrap motion-reduce:animate-none">
             {Array.from({ length: 2 }).map((_, k) => (
-              <span key={k} className="marquee-set">
-                {[['Truck', <>Free delivery on orders above ₦50,000</>], ['Stamp', <>Import duties included — no surprise charges</>], ['Gift', <>New here? 10% off with <b>OJA10</b></>], ['Lock', <>Payments verified securely</>], ['RotateCcw', <>Easy returns on eligible items</>]].map(([ico, text], j) => (
-                  <span key={j} className="marquee-item"><Icon name={ico} size={14} />{text}</span>
+              <span key={k} className="inline-flex">
+                {PROMOS.map(([ico, text], j) => (
+                  <span key={j} className="mr-9 inline-flex items-center gap-1.5"><Icon name={ico} size={14} className="text-sun" />{text}</span>
                 ))}
               </span>
             ))}
           </div>
         </div>
       </div>
-      <div className="header-main wrap">
+      <div className={cn(wrap, 'flex h-[70px] items-center gap-[18px] max-md:h-auto max-md:flex-wrap max-md:gap-x-3.5 max-md:gap-y-2.5 max-md:py-2.5')}>
         <Logo />
-        <label className="deliver-to">
-          <span className="muted small">Deliver to</span>
-          <select value={state.deliveryState} onChange={(e) => dispatch({ type: 'setDeliveryState', state: e.target.value })} aria-label="Delivery state">
+        <label className="flex flex-col leading-[1.1] max-md:hidden">
+          <span className="text-[13px] text-muted-foreground">Deliver to</span>
+          <select className="cursor-pointer border-0 bg-transparent p-0 text-[14px] font-bold" value={state.deliveryState} onChange={(e) => dispatch({ type: 'setDeliveryState', state: e.target.value })} aria-label="Delivery state">
             {STATES.map((s) => <option key={s}>{s}</option>)}
           </select>
         </label>
         <SearchBox />
-        <nav className="header-actions">
+        <nav className="ml-auto flex gap-1">
           <LanguagePicker />
-          <Link to="/orders" className="hbtn"><span className="hbtn-ico"><Icon name="Package" size={22} /></span><span className="hbtn-label">Orders</span></Link>
+          <Link to="/orders" className={hbtn}><span className={hbtnIco}><Icon name="Package" size={22} /></span><span className="max-md:hidden">Orders</span></Link>
           {state.user
-            ? <Link to="/account" className="hbtn"><span className="hbtn-ico"><Icon name="User" size={22} /></span><span className="hbtn-label">{state.user.name.split(' ')[0]}</span></Link>
-            : <button className="hbtn" onClick={() => dispatch({ type: 'openAuth' })}><span className="hbtn-ico"><Icon name="User" size={22} /></span><span className="hbtn-label">Sign in</span></button>}
+            ? <Link to="/account" className={hbtn}><span className={hbtnIco}><Icon name="User" size={22} /></span><span className="max-md:hidden">{state.user.name.split(' ')[0]}</span></Link>
+            : <button className={hbtn} onClick={() => dispatch({ type: 'openAuth' })}><span className={hbtnIco}><Icon name="User" size={22} /></span><span className="max-md:hidden">Sign in</span></button>}
           <CartButton />
         </nav>
       </div>
-      <div className="catbar">
-        <div className="wrap catbar-row">
+      <div className="border-t border-line">
+        <div className={cn(wrap, 'relative flex items-center gap-1.5')}>
           <AllCategories />
-          <div className="catbar-inner">
-            <NavLink to="/search?sort=popular" className="catlink hot"><Icon name="Flame" size={15} /> Best sellers</NavLink>
-            <NavLink to="/deals" className="catlink hot"><Icon name="Zap" size={15} /> Flash deals</NavLink>
-            {CATEGORIES.map((c) => <NavLink key={c.id} to={`/search?cat=${c.id}`} className="catlink">{c.name}</NavLink>)}
+          <div className="no-scrollbar flex h-[42px] min-w-0 flex-1 items-center gap-1 overflow-x-auto max-md:h-10">
+            <NavLink to="/search?sort=popular" className={catlinkHot}><Icon name="Flame" size={15} /> Best sellers</NavLink>
+            <NavLink to="/deals" className={catlinkHot}><Icon name="Zap" size={15} /> Flash deals</NavLink>
+            {CATEGORIES.map((c) => <NavLink key={c.id} to={`/search?cat=${c.id}`} className={catlink}>{c.name}</NavLink>)}
           </div>
         </div>
       </div>
@@ -288,13 +286,13 @@ export function MobileTabBar() {
   const { cartCount } = useStore()
   const items = [['/', 'House', 'Home'], ['/search', 'Search', 'Explore'], ['/deals', 'Zap', 'Deals'], ['/cart', 'ShoppingCart', 'Cart'], ['/account', 'User', 'Me']]
   return (
-    <nav className="tabbar">
+    <nav className="tw fixed inset-x-0 bottom-0 z-45 hidden h-[62px] bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_0_var(--color-line)] max-md:flex">
       {items.map(([to, ico, label]) => (
-        <NavLink key={to} to={to} end={to === '/'} className="tabbar-item">
+        <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => cn('relative flex flex-1 flex-col items-center justify-center text-[11px] font-semibold text-muted-foreground', isActive && 'text-brand')}>
           {({ isActive }) => (
             <>
-              {isActive && <motion.span layoutId="tabbar-dot" className="tabbar-bg" />}
-              <span className="tabbar-ico"><Icon name={ico} size={21} stroke={isActive ? 2.2 : 1.8} />{to === '/cart' && cartCount > 0 && <b className="tabbar-badge">{cartCount}</b>}</span>
+              {isActive && <motion.span layoutId="tabbar-dot" className="absolute top-1.5 h-[30px] w-12 rounded-[15px] bg-brand-tint" />}
+              <span className="relative grid h-6 place-items-center"><Icon name={ico} size={21} stroke={isActive ? 2.2 : 1.8} />{to === '/cart' && cartCount > 0 && <b className="absolute -right-2.5 -top-1 grid h-4 min-w-4 place-items-center rounded-lg bg-orange px-1 text-[10px] text-white">{cartCount}</b>}</span>
               <span>{label}</span>
             </>
           )}
@@ -347,54 +345,57 @@ const PAYMENTS = [
   ['Pay on delivery', '#ff7a2e', <><rect x="19" y="9" width="22" height="13" rx="2" fill="none" stroke="#fff" strokeWidth="2" /><circle cx="30" cy="15.5" r="3" fill="#fff" /><text x="30" y="33" textAnchor="middle" fontFamily={T.font} fontWeight="800" fontSize="7" letterSpacing=".4" fill="#fff">ON DELIVERY</text></>],
 ]
 
+const footH = 'mb-4 text-[17px] text-white max-sm:mb-2.5 max-sm:text-[15px]'
+const PayTile = ({ name, bg, art }) => (
+  <svg className="block h-10 w-[60px] shrink-0 rounded-[4px] shadow-[0_0_0_1px_rgba(255,255,255,.1)]" viewBox="0 0 60 40" role="img" aria-label={name}><title>{name}</title><rect width="60" height="40" fill={bg} />{art}</svg>
+)
+
 export function Footer() {
   const { toast } = useStore()
   const soon = (what) => (e) => { e.preventDefault(); toast(`${what} is coming soon`, { icon: 'Bell' }) }
   return (
-    <footer className="footer">
-      <div className="wrap footer-top">
+    <footer className="tw mt-10 bg-brand-ink pb-7 pt-[52px] text-[#c3cce0] max-md:pb-[90px]">
+      <div className={cn(wrap, 'grid grid-cols-[1.25fr_1fr_0.9fr_1.55fr] gap-8 max-lg:grid-cols-3 max-md:grid-cols-2 max-sm:gap-x-4 max-sm:gap-y-6')}>
         {FOOTER_LINKS.map(([title, links]) => (
-          <div key={title} className="footer-col">
-            <h4>{title}</h4>
-            {links.map(([label, to]) => <Link key={label} to={to}>{label}</Link>)}
+          <div key={title}>
+            <h4 className={footH}>{title}</h4>
+            {links.map(([label, to]) => <Link key={label} to={to} className="block py-1.5 text-[15px] text-[#c3cce0] transition-colors duration-150 hover:text-white max-sm:py-[5px] max-sm:text-[14px]">{label}</Link>)}
           </div>
         ))}
-        <div className="footer-side">
-          <h4>Connect with Oja</h4>
-          <div className="socials">
+        <div className="max-lg:col-span-full">
+          <h4 className={footH}>Connect with Oja</h4>
+          <div className="flex flex-wrap gap-[18px]">
             {SOCIALS.map(([name, glyph]) => (
-              <a key={name} href="#" aria-label={name} title={name} onClick={soon(`Oja on ${name}`)}>
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{glyph}</svg>
+              <a key={name} href="#" aria-label={name} title={name} onClick={soon(`Oja on ${name}`)} className="text-white opacity-90 transition-[opacity,color] duration-150 hover:text-orange hover:opacity-100">
+                <svg className="inline align-baseline" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{glyph}</svg>
               </a>
             ))}
           </div>
-          <div className="footer-promo"><p>From Asia, Europe, America to your doorstep, we handle every step.</p></div>
+          {/* Cargoland warehouse photo on the right, faded into black on the left for the text */}
+          <div className="relative mt-[18px] flex min-h-[100px] items-center overflow-hidden rounded-xl border-2 border-white/55 px-[18px] py-3 max-lg:max-w-[560px]"
+            style={{ background: `linear-gradient(90deg, #000 0%, #000 38%, rgba(0, 0, 0, .55) 55%, rgba(0, 0, 0, 0) 78%), url(${footerWarehouse}) right 26% / 64% auto no-repeat, #000` }}>
+            <p className="max-w-[66%] font-display text-[15.5px] font-bold leading-[1.3] text-white max-lg:max-w-[58%] max-lg:text-[17px] max-xs:max-w-[64%] max-xs:text-[16px]">From Asia, Europe, America to your doorstep, we handle every step.</p>
+          </div>
         </div>
       </div>
 
-      <div className="wrap footer-brand"><Logo light tagline /></div>
+      <div className={cn(wrap, 'mt-9')}><Logo light tagline className="h-16" /></div>
 
-      <div className="wrap footer-trust">
+      <div className={cn(wrap, 'mt-8 grid grid-cols-2 gap-8 max-md:grid-cols-1')}>
         <div>
-          <h4>Security certification</h4>
-          <div className="pay-row">{SECURITY.map(([name, bg, art]) => (
-            <svg key={name} className="pay-tile" viewBox="0 0 60 40" role="img" aria-label={name}><title>{name}</title><rect width="60" height="40" fill={bg} />{art}</svg>
-          ))}</div>
+          <h4 className={footH}>Security certification</h4>
+          <div className="flex flex-wrap gap-2.5">{SECURITY.map(([name, bg, art]) => <PayTile key={name} name={name} bg={bg} art={art} />)}</div>
         </div>
         <div>
-          <h4>We accept</h4>
-          <div className="pay-row">{PAYMENTS.map(([name, bg, art]) => (
-            <svg key={name} className="pay-tile" viewBox="0 0 60 40" role="img" aria-label={name}><title>{name}</title><rect width="60" height="40" fill={bg} />{art}</svg>
-          ))}</div>
+          <h4 className={footH}>We accept</h4>
+          <div className="flex flex-wrap gap-2.5">{PAYMENTS.map(([name, bg, art]) => <PayTile key={name} name={name} bg={bg} art={art} />)}</div>
         </div>
       </div>
 
-      <div className="wrap footer-base">
+      <div className={cn(wrap, 'mt-9 flex flex-wrap items-center justify-center gap-x-[26px] gap-y-2.5 border-t border-white/12 pt-5 text-[14px] max-md:pt-0 max-sm:justify-start max-sm:gap-x-[18px]')}>
         <span>© 2026 Oja by Cargoland</span>
-        <Link to="/help">Terms of use</Link>
-        <Link to="/help">Privacy policy</Link>
-        <Link to="/help">Cookie choices</Link>
-        <span className="footer-note">Prototype build — mock data, no real payments.</span>
+        {['Terms of use', 'Privacy policy', 'Cookie choices'].map((l) => <Link key={l} to="/help" className="text-[#c3cce0] underline underline-offset-3 hover:text-white">{l}</Link>)}
+        <span className="w-full text-center text-[12.5px] opacity-55 max-sm:text-left">Prototype build — mock data, no real payments.</span>
       </div>
     </footer>
   )

@@ -7,7 +7,7 @@ import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { ProductArt } from '../components/ui'
+import { ProductArt } from '../components/common'
 import { naira, stagesFor, shippingFee, windowLabel, makeOrderRef, STATES } from '../lib/commerce'
 
 const DAY = 864e5
@@ -358,7 +358,7 @@ function CreateOrderModal({ onClose, onCreated, recent }) {
             <h4>Customer</h4>
             <label className="set-field"><span>Customer</span>
               <select id="co-pick" value={c.pick} onChange={(e) => pickRecent(e.target.value)}><option value="new">New customer</option>{recent.map((r) => <option key={r.name} value={r.name}>{r.name} · {r.state}</option>)}</select></label>
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Full name</span><input id="co-name" value={c.name} onChange={(e) => setC({ ...c, name: e.target.value })} placeholder="Ada Okafor" autoComplete="off" /></label>
               <label className="set-field"><span>Phone</span><input id="co-phone" value={c.phone} onChange={(e) => setC({ ...c, phone: e.target.value })} placeholder="0803 123 4567" inputMode="tel" autoComplete="off" /></label>
             </div>
@@ -415,7 +415,7 @@ function CreateOrderModal({ onClose, onCreated, recent }) {
               <label className={`pe-radio ${delivery === 'deliver' ? 'on' : ''}`}><input type="radio" name="co-del" checked={delivery === 'deliver'} onChange={() => setDelivery('deliver')} /> Home delivery</label>
               <label className={`pe-radio ${delivery === 'pickup' ? 'on' : ''}`}><input type="radio" name="co-del" checked={delivery === 'pickup'} onChange={() => setDelivery('pickup')} /> Pickup at Ikeja</label>
             </div>
-            <div className="pe-3 co-addr">
+            <div className="pe-cols3 co-addr">
               {delivery === 'deliver' && <label className="set-field pe-span2"><span>Address</span><input id="co-line" value={c.line} onChange={(e) => setC({ ...c, line: e.target.value })} placeholder="12 Admiralty Way, Lekki Phase 1" /></label>}
               <label className="set-field"><span>State</span><select id="co-state" value={c.state} onChange={(e) => setC({ ...c, state: e.target.value })}>{STATES.map((s) => <option key={s}>{s}</option>)}</select></label>
             </div>
@@ -424,7 +424,7 @@ function CreateOrderModal({ onClose, onCreated, recent }) {
 
           <section className="co-sec">
             <h4>Payment</h4>
-            <div className="pe-3">
+            <div className="pe-cols3">
               <label className="set-field"><span>Method</span><select id="co-method" value={method} onChange={(e) => setMethod(e.target.value)}>{PAY_METHODS.map((m) => <option key={m}>{m}</option>)}</select></label>
               <label className="set-field"><span>Status</span><select id="co-paid" value={paid ? 'paid' : 'pending'} onChange={(e) => setPaid(e.target.value === 'paid')}><option value="paid">Paid</option><option value="pending">Awaiting payment</option></select></label>
               <label className="set-field"><span>Order came via</span><select id="co-channel" value={channel} onChange={(e) => setChannel(e.target.value)}>{CHANNELS.map((m) => <option key={m}>{m}</option>)}</select></label>

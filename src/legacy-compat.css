@@ -1,0 +1,17 @@
+/* TEMPORARY migration shim. Tailwind's preflight resets browser defaults; markup that
+   still uses the legacy classes was designed against those defaults, so we restore them
+   everywhere except inside migrated markup (.tw) and shadcn/ui parts ([data-slot]).
+   Deleted together with the legacy stylesheet once every page is migrated. */
+:where(*):not(:where(.tw, .tw *, [data-slot], [data-slot] *, [data-sonner-toaster], [data-sonner-toaster] *)) {
+  margin: revert; padding: revert; border: revert;
+}
+:where(img, svg, video, canvas, audio, iframe, embed, object):not(:where(.tw, .tw *, [data-slot], [data-slot] *)) {
+  display: revert; vertical-align: revert; max-width: revert; height: revert;
+}
+:where(ul, ol, menu):not(:where(.tw, .tw *, [data-slot], [data-slot] *)) { list-style: revert; }
+:where(h1, h2, h3, h4, h5, h6):not(:where(.tw, .tw *, [data-slot], [data-slot] *)) { font-size: revert; font-weight: revert; }
+:where(table):not(:where(.tw, .tw *, [data-slot], [data-slot] *)) { border-collapse: revert; border-color: revert; text-indent: revert; }
+:where(input, select, textarea, button):not(:where(.tw, .tw *, [data-slot], [data-slot] *)) { background-color: revert; border-radius: revert; letter-spacing: revert; font-feature-settings: revert; font-variation-settings: revert; }
+:where(textarea):not(:where(.tw, .tw *, [data-slot], [data-slot] *)) { resize: revert; }
+:where(input, textarea):not(:where(.tw, .tw *, [data-slot], [data-slot] *))::placeholder { opacity: revert; color: revert; }
+:where(abbr):not(:where(.tw, .tw *)) { text-decoration: revert; }

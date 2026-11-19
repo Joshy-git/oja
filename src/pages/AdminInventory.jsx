@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { motion } from 'framer-motion'
 import { useStore } from '../store/Store'
 import { Icon } from '../components/Icon'
-import { ProductArt, spring } from '../components/ui'
+import { ProductArt, spring } from '../components/common'
 import { CATEGORIES, STOCK, patchProduct } from '../data/catalog'
 import { naira } from '../lib/commerce'
 import { Menu, useOutside } from './AdminOrders'
@@ -239,7 +239,7 @@ function RestockModal({ products, initial, onClose, onSave }) {
             </label>
             {tried && errors.id && <div className="err small">{errors.id}</div>}
             {p && <div className="rs-now"><span className="ord-thumb"><ProductArt p={p} size="xs" /></span><div className="small"><b>{p.units.toLocaleString()} units</b> now · {locName(p.stock)}<div className="muted">Landed cost {naira(p.landed.total)} per unit</div></div></div>}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Units to add</span><input id="rs-units" type="number" min="1" step="1" inputMode="numeric" value={units} onChange={(e) => setUnits(e.target.value)} placeholder="e.g. 200" /></label>
               <label className="set-field"><span>Arriving at</span><select id="rs-loc" value={loc} onChange={(e) => setLoc(e.target.value)}>{LOCATIONS.slice(0, 3).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></label>
             </div>

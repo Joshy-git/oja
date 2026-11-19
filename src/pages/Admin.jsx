@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence, animate, useMotionValue, useTransform } from 'framer-motion'
 import { useStore } from '../store/Store'
-import { ProductArt, StockBadge, spring } from '../components/ui'
+import { ProductArt, StockBadge, spring } from '../components/common'
 import { Logo } from '../components/Layout'
 import { Icon } from '../components/Icon'
 import { CATEGORIES, STOCK, patchProduct } from '../data/catalog'
@@ -315,7 +315,7 @@ export default function Admin() {
       {menu && <div className="adm-scrim" onClick={() => setMenu(false)} />}
       <aside className={`adm-side ${menu ? 'open' : ''}`}>
         <div className="adm-brand">
-          <Logo />
+          <Logo className="h-[26px]" linkClassName={collapsed ? "md:hidden" : undefined} />
           <span className="adm-tag">Ops</span>
           <button className="icon-btn adm-collapse" onClick={() => setCollapsed((c) => !c)} aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}><Icon name="PanelLeft" size={17} /></button>
         </div>

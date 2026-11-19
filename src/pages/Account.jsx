@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store/Store'
-import { Page, Grid, Empty, Tabs, spring } from '../components/ui'
+import { Page, Grid, Empty, Tabs, spring } from '../components/common'
 import { STATES } from '../lib/commerce'
 import { Icon } from '../components/Icon'
 

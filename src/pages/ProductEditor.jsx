@@ -256,7 +256,7 @@ export default function ProductEditor({ productId, minMargin, onBack, onOpen, ed
           <div className="pe-card">
             <h4 className="pe-h">Basic information</h4>
             <label className="set-field"><span>Brand name</span><input id="pe-brand" list="pe-brands" value={f.brand} onChange={set('brand')} placeholder="e.g. Oja Select" /><datalist id="pe-brands">{BRANDS.map((b) => <option key={b} value={b} />)}</datalist></label>
-            <div className="pe-3">
+            <div className="pe-cols3">
               <label className="set-field"><span>Category</span><select id="pe-cat" value={f.category} onChange={set('category')}>{CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
               <label className="set-field"><span>Stock location</span><select id="pe-stock" value={f.stock} onChange={set('stock')}>{Object.entries(STOCK).filter(([k]) => k !== 'oos').map(([k, s]) => <option key={k} value={k}>{s.short}</option>)}</select></label>
               <label className="set-field"><span>Price (₦)</span><input id="pe-price" type="number" min="0" inputMode="numeric" value={f.price} onChange={set('price')} placeholder="15000" /></label>
@@ -269,7 +269,7 @@ export default function ProductEditor({ productId, minMargin, onBack, onOpen, ed
 
           <div className="pe-card">
             <h4 className="pe-h">Pricing & cost</h4>
-            <div className="pe-3">
+            <div className="pe-cols3">
               <label className="set-field"><span>Selling price (₦)</span><input type="number" min="0" inputMode="numeric" value={f.price} onChange={set('price')} aria-label="Selling price" /></label>
               <label className="set-field"><span>Compare-at price (₦)</span><input id="pe-ref" type="number" min="0" inputMode="numeric" value={f.refPrice} onChange={set('refPrice')} placeholder="Optional" /></label>
               <label className="set-field"><span>Landed cost / unit (₦)</span><input id="pe-landed" type="number" min="0" inputMode="numeric" value={f.landedTotal} onChange={set('landedTotal')} placeholder="9500" /></label>
@@ -291,12 +291,12 @@ export default function ProductEditor({ productId, minMargin, onBack, onOpen, ed
 
           <div className="pe-card">
             <h4 className="pe-h">Inventory & options</h4>
-            <div className="pe-3">
+            <div className="pe-cols3">
               <label className="set-field"><span>Units on hand</span><input id="pe-qty" type="number" min="0" step="1" inputMode="numeric" value={f.qty} onChange={set('qty')} placeholder="250" /></label>
               <label className="set-field pe-span2"><span>Supplier</span><input id="pe-supplier" value={f.supplier} onChange={set('supplier')} placeholder="e.g. Shenzhen Jiaxin Trading" /></label>
             </div>
             {show('qty')}
-            <div className="pe-2">
+            <div className="pe-cols2">
               <label className="set-field"><span>Colours <em>comma-separated</em></span><input id="pe-colors" value={f.colors} onChange={set('colors')} placeholder="Black, White" /></label>
               <label className="set-field"><span>Sizes <em>comma-separated</em></span><input id="pe-sizes" value={f.sizes} onChange={set('sizes')} placeholder="S, M, L" /></label>
             </div>

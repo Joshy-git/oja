@@ -1,5 +1,6 @@
 // Single icon set for the whole app (Lucide line icons). Data and state refer to
 // icons by name so they stay serialisable (toasts, order stages, categories).
+import { cn } from '@/lib/utils'
 import {
   Smartphone, CookingPot, Shirt, Sparkles, Dumbbell, Car, Wrench, ToyBrick, PencilRuler, Luggage, PawPrint,
   BatteryCharging, Sun, Fan, Footprints, Watch, Glasses, Gift, ShoppingBag, ReceiptText, MapPin, ShieldCheck,
@@ -25,5 +26,5 @@ const ICONS = {
 export function Icon({ name, size = 18, stroke = 1.9, className = '', fill, ...rest }) {
   const C = ICONS[name]
   if (!C) return null
-  return <C size={size} strokeWidth={stroke} className={`icon ${className}`} fill={fill || 'none'} aria-hidden focusable="false" {...rest} />
+  return <C size={size} strokeWidth={stroke} className={cn('icon', className)} fill={fill || 'none'} aria-hidden focusable="false" {...rest} />
 }
