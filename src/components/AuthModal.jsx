@@ -1,8 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useStore } from '../store/Store'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Icon } from './Icon'
+import { linkCls } from './common'
 
 // Sign-in / register pop-up. Email and phone use a demo 6-digit code (no backend);
 // Google, Facebook and Apple are placeholders until real OAuth apps exist.
@@ -57,22 +62,15 @@ export function AuthModal() {
   const [code, setCode] = useState('')
   const [target, setTarget] = useState(null) // { account?, draft? }
   const [hidePrev, setHidePrev] = useState(false)
-  const dialog = useRef(null)
 
   const prev = state.lastLogin ? state.accounts.find((u) => accountId(u) === state.lastLogin) : null
   const showPrev = prev && !hidePrev
 
-  // Reset each time the pop-up opens; lock page scroll and close on Escape
+  // Reset each time the pop-up opens (the dialog itself locks scroll and handles Escape)
   useEffect(() => {
     if (!open) return
     setView('home'); setValue(''); setName(''); setOtp(''); setTarget(null); setHidePrev(false)
-    const body = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const esc = (e) => { if (e.key === 'Escape') close() }
-    document.addEventListener('keydown', esc)
-    setTimeout(() => dialog.current?.focus(), 30)
-    return () => { document.body.style.overflow = body; document.removeEventListener('keydown', esc) }
-  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open])
 
   const sendCode = (t) => {
     const c = String(Math.floor(100000 + Math.random() * 900000))
@@ -108,94 +106,108 @@ export function AuthModal() {
   const choose = (m) => { setMethod(m); setValue(''); setName(''); setView('form') }
   const social = (provider) => toast(`Sign in with ${provider} is coming soon. Use email or phone for now.`, { icon: 'Bell', ms: 3500 })
   const sentTo = target?.account ? mask(target.account) : target?.draft ? (target.draft.email || target.draft.phone) : ''
+  const twoCol = showPrev && view === 'home'
+
+  const opt = 'flex w-full items-center justify-center gap-3.5 rounded-full border-[1.5px] border-[#c9cfdb] bg-white px-5 py-[13px] text-[16px] font-medium text-ink transition-colors duration-150 hover:border-brand hover:bg-[#fafbfd] max-sm:px-4 max-sm:py-3 max-sm:text-[15px]'
+  const way = cn(opt, 'justify-start pl-[max(20px,20%)] max-sm:pl-[max(16px,14%)] [&>:first-child]:flex-[0_0_24px]')
+  const h3 = 'mb-1 self-stretch text-left text-[17px] text-ink'
+  const field = 'grid gap-1.5'
+  const fieldLabel = 'text-[13px] font-semibold text-ink-2'
+  const input = 'h-auto w-full rounded-lg border-[1.5px] border-line bg-white px-3.5 py-3 text-[15px] shadow-none focus-visible:border-brand focus-visible:ring-[3px] focus-visible:ring-brand-tint md:text-[15px]'
+  const note = 'flex items-center gap-2 rounded-lg bg-brand-tint px-3 py-2.5 text-[13.5px] text-brand'
+  const back = 'inline-flex items-center gap-1.5 self-start text-[14px] font-semibold text-ink-2 hover:text-brand'
+  const step = 'mx-auto flex max-w-[420px] flex-col gap-3'
+  const err = 'text-[13px] text-bad'
 
   return (
-    <AnimatePresence>
-      {open && (
-        <>
-          <motion.div className="auth-scrim" onClick={close} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} />
-          <motion.div ref={dialog} tabIndex={-1} className={`auth-modal ${showPrev && view === 'home' ? 'two-col' : ''}`} role="dialog" aria-modal="true" aria-labelledby="auth-title"
-            initial={{ opacity: 0, y: 24, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.98 }} transition={{ duration: 0.22 }}>
-            <button className="auth-close" onClick={close} aria-label="Close"><Icon name="X" size={22} /></button>
+    <Dialog open={open} onOpenChange={(o) => !o && close()}>
+      <DialogContent showCloseButton={false} overlayClassName="z-150 bg-[rgba(7,16,35,.55)] backdrop-blur-[3px]"
+        className={cn('tw z-160 block max-h-[calc(100dvh-32px)] w-[min(580px,calc(100vw-32px))] max-w-none gap-0 overflow-y-auto overscroll-contain rounded-lg border-0 bg-white px-10 pb-6 pt-[34px] shadow-[0_30px_80px_rgba(7,16,35,.35)] sm:max-w-none',
+          'max-sm:bottom-0 max-sm:top-auto max-sm:max-h-[94dvh] max-sm:w-screen max-sm:translate-y-0 max-sm:rounded-b-none max-sm:px-[18px] max-sm:pb-[calc(18px+env(safe-area-inset-bottom,0px))] max-sm:pt-[26px]',
+          twoCol && 'w-[min(1000px,calc(100vw-32px))]')}>
+        <button className="absolute right-3.5 top-3.5 grid size-10 place-items-center rounded-full text-ink hover:bg-background" onClick={close} aria-label="Close"><Icon name="X" size={22} /></button>
 
-            <header className="auth-top">
-              <h2 id="auth-title">{view === 'code' ? 'Enter your code' : target?.draft || (view === 'form' && isNew) ? 'Create your account' : 'Sign in'}</h2>
-              <p className="auth-safe"><Icon name="Lock" size={15} fill="currentColor" /> All data is safeguarded</p>
-            </header>
+        <header className="grid gap-1.5 text-center">
+          <DialogTitle className="text-[28px] font-extrabold leading-[1.15] text-ink max-sm:text-[23px]">{view === 'code' ? 'Enter your code' : target?.draft || (view === 'form' && isNew) ? 'Create your account' : 'Sign in'}</DialogTitle>
+          <DialogDescription className="inline-flex items-center justify-center gap-1.5 text-[15px] font-medium text-good"><Icon name="Lock" size={15} fill="currentColor" /> All data is safeguarded</DialogDescription>
+        </header>
 
-            <ul className="auth-perks">
-              {PERKS.map(([ico, t, s]) => <li key={t}><Icon name={ico} size={22} /><span><b>{t}</b>{s}</span></li>)}
-            </ul>
+        <ul className={cn('mb-[26px] mt-[22px] grid rounded-lg bg-brand-tint px-2.5 py-3.5 max-sm:mb-[18px] max-sm:mt-4 max-sm:px-1 max-sm:py-2.5', twoCol ? 'grid-cols-4 max-md:grid-cols-2 max-md:gap-y-3' : 'grid-cols-2 gap-y-3')}>
+          {PERKS.map(([ico, t, s], i) => (
+            <li key={t} className={cn('flex min-w-0 items-center gap-2.5 px-3.5 py-0.5 text-brand max-sm:gap-2 max-sm:px-2', i > 0 && 'border-l border-[rgba(11,32,69,.14)]', i === 2 && (twoCol ? 'max-md:border-l-0' : 'border-l-0'))}>
+              <Icon name={ico} size={22} className="text-orange" />
+              <span className="flex min-w-0 flex-col text-[12.5px] leading-[1.3] text-ink-2 max-sm:text-[11.5px]"><b className="text-[14px] text-brand max-sm:text-[12.5px]">{t}</b>{s}</span>
+            </li>
+          ))}
+        </ul>
 
-            <AnimatePresence mode="wait" initial={false}>
-              {view === 'home' && (
-                <motion.div key="home" className="auth-body" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                  {showPrev && (
-                    <>
-                      <section className="auth-prev">
-                        <h3>Sign in with a previously used account</h3>
-                        <span className="auth-avatar" aria-hidden>{prev.name[0]}</span>
-                        <b className="auth-prev-name">{prev.name}</b>
-                        <span className="muted">{mask(prev)}</span>
-                        <button className="auth-opt strong" onClick={() => sendCode({ account: prev })}>
-                          <Icon name={prev.email ? 'Mail' : 'Smartphone'} size={20} />Continue as {prev.name.split(' ')[0]}
-                        </button>
-                        <button className="auth-opt" onClick={() => setHidePrev(true)}>Use another way to sign in</button>
-                        <div className="auth-links">
-                          <button onClick={() => dispatch({ type: 'forgetLastLogin' })}>Remove account</button>
-                          <span aria-hidden>|</span>
-                          <Link to="/help" onClick={close}>Trouble signing in?</Link>
-                        </div>
-                      </section>
-                      <div className="auth-or" aria-hidden><span>OR</span></div>
-                    </>
-                  )}
-                  <section className="auth-ways">
-                    <h3>Register / Sign in with another account</h3>
-                    <button className="auth-opt" onClick={() => choose('email')}><Icon name="Mail" size={22} />Continue with Email</button>
-                    <button className="auth-opt" onClick={() => social('Google')}><GoogleLogo />Continue with Google</button>
-                    <button className="auth-opt" onClick={() => social('Facebook')}><FacebookLogo />Continue with Facebook</button>
-                    <button className="auth-opt" onClick={() => social('Apple')}><AppleLogo />Continue with Apple</button>
-                    <button className="auth-opt" onClick={() => choose('phone')}><Icon name="Smartphone" size={22} />Continue with phone number</button>
+        <AnimatePresence mode="wait" initial={false}>
+          {view === 'home' && (
+            <motion.div key="home" className={cn('grid gap-3.5', twoCol && 'grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-9 max-md:grid-cols-1 max-md:gap-5')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              {showPrev && (
+                <>
+                  <section className="flex min-w-0 flex-col items-center gap-3">
+                    <h3 className={h3}>Sign in with a previously used account</h3>
+                    <span className="mt-2 grid size-24 place-items-center rounded-full bg-brand font-display text-[42px] font-extrabold text-white shadow-[0_0_0_4px_var(--color-brand-tint)]" aria-hidden>{prev.name[0]}</span>
+                    <b className="mt-1 font-display text-[19px]">{prev.name}</b>
+                    <span className="-mt-2 mb-2 text-muted-foreground">{mask(prev)}</span>
+                    <button className={cn(opt, 'border-ink font-bold')} onClick={() => sendCode({ account: prev })}>
+                      <Icon name={prev.email ? 'Mail' : 'Smartphone'} size={20} />Continue as {prev.name.split(' ')[0]}
+                    </button>
+                    <button className={opt} onClick={() => setHidePrev(true)}>Use another way to sign in</button>
+                    <div className="mt-1 flex items-center justify-center gap-3.5 text-[14px] text-muted-foreground">
+                      <button className="text-ink-2 hover:text-brand hover:underline" onClick={() => dispatch({ type: 'forgetLastLogin' })}>Remove account</button>
+                      <span aria-hidden>|</span>
+                      <Link to="/help" className="text-ink-2 hover:text-brand hover:underline" onClick={close}>Trouble signing in?</Link>
+                    </div>
                   </section>
-                </motion.div>
+                  <div className="flex flex-col items-center gap-2.5 self-stretch text-[14px] font-semibold text-muted-foreground before:w-px before:flex-1 before:bg-line before:content-[''] after:w-px after:flex-1 after:bg-line after:content-[''] max-md:flex-row max-md:before:h-px max-md:before:w-auto max-md:after:h-px max-md:after:w-auto" aria-hidden><span>OR</span></div>
+                </>
               )}
+              <section className="flex min-w-0 flex-col gap-3">
+                <h3 className={h3}>Register / Sign in with another account</h3>
+                <button className={way} onClick={() => choose('email')}><Icon name="Mail" size={22} />Continue with Email</button>
+                <button className={way} onClick={() => social('Google')}><GoogleLogo />Continue with Google</button>
+                <button className={way} onClick={() => social('Facebook')}><FacebookLogo />Continue with Facebook</button>
+                <button className={way} onClick={() => social('Apple')}><AppleLogo />Continue with Apple</button>
+                <button className={way} onClick={() => choose('phone')}><Icon name="Smartphone" size={22} />Continue with phone number</button>
+              </section>
+            </motion.div>
+          )}
 
-              {view === 'form' && (
-                <motion.form key="form" className="auth-step" onSubmit={submitForm} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                  <button type="button" className="auth-back" onClick={() => setView('home')}><Icon name="ArrowLeft" size={16} /> All sign-in options</button>
-                  <label className="auth-field">
-                    <span>{method === 'email' ? 'Email address' : 'Phone number'}</span>
-                    <input id="auth-id" autoFocus value={value} onChange={(e) => setValue(e.target.value)} type={method === 'email' ? 'email' : 'tel'} inputMode={method === 'email' ? 'email' : 'tel'} autoComplete={method === 'email' ? 'email' : 'tel'} placeholder={method === 'email' ? 'you@example.com' : '0803 123 4567'} />
-                  </label>
-                  {value && !valid && <div className="err small">{method === 'email' ? 'Enter a valid email address' : 'Enter a valid Nigerian mobile number, like 0803 123 4567'}</div>}
-                  {existing && <div className="auth-note good"><Icon name="CircleCheck" size={16} /> Welcome back, {existing.name.split(' ')[0]}. We'll send you a sign-in code.</div>}
-                  {isNew && (
-                    <>
-                      <div className="auth-note">New to Oja? Add your name to create your account.</div>
-                      <label className="auth-field"><span>Full name</span><input id="auth-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Ada Okafor" /></label>
-                    </>
-                  )}
-                  <button className="btn btn-primary lg btn-block" disabled={!valid || (isNew && !name.trim())}>{isNew ? 'Create account' : 'Send code'}</button>
-                </motion.form>
+          {view === 'form' && (
+            <motion.form key="form" className={step} onSubmit={submitForm} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
+              <button type="button" className={back} onClick={() => setView('home')}><Icon name="ArrowLeft" size={16} /> All sign-in options</button>
+              <label className={field}>
+                <span className={fieldLabel}>{method === 'email' ? 'Email address' : 'Phone number'}</span>
+                <Input id="auth-id" className={input} autoFocus value={value} onChange={(e) => setValue(e.target.value)} type={method === 'email' ? 'email' : 'tel'} inputMode={method === 'email' ? 'email' : 'tel'} autoComplete={method === 'email' ? 'email' : 'tel'} placeholder={method === 'email' ? 'you@example.com' : '0803 123 4567'} aria-invalid={(value && !valid) || undefined} />
+              </label>
+              {value && !valid && <div className={err}>{method === 'email' ? 'Enter a valid email address' : 'Enter a valid Nigerian mobile number, like 0803 123 4567'}</div>}
+              {existing && <div className={cn(note, 'bg-good-tint text-good-ink')}><Icon name="CircleCheck" size={16} /> Welcome back, {existing.name.split(' ')[0]}. We'll send you a sign-in code.</div>}
+              {isNew && (
+                <>
+                  <div className={note}>New to Oja? Add your name to create your account.</div>
+                  <label className={field}><span className={fieldLabel}>Full name</span><Input id="auth-name" className={input} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" placeholder="Ada Okafor" /></label>
+                </>
               )}
+              <Button size="lg" className="w-full" disabled={!valid || (isNew && !name.trim())}>{isNew ? 'Create account' : 'Send code'}</Button>
+            </motion.form>
+          )}
 
-              {view === 'code' && (
-                <motion.form key="code" className="auth-step" onSubmit={verify} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
-                  <button type="button" className="auth-back" onClick={() => setView(target?.account && target.account === prev ? 'home' : 'form')}><Icon name="ArrowLeft" size={16} /> Back</button>
-                  <p className="muted">We sent a 6-digit code to <b className="ink">{sentTo}</b>.</p>
-                  <input id="auth-otp" className="otp auth-otp" autoFocus maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} placeholder="••••••" inputMode="numeric" autoComplete="one-time-code" aria-label="6-digit code" />
-                  {otp.length === 6 && otp !== code && <div className="err small">That code doesn't match. Check the latest code and try again.</div>}
-                  <button className="btn btn-primary lg btn-block" disabled={otp.length !== 6}>{target?.draft ? 'Verify & create account' : 'Verify & sign in'}</button>
-                  <button type="button" className="link auth-resend" onClick={() => sendCode(target)}>Send a new code</button>
-                </motion.form>
-              )}
-            </AnimatePresence>
+          {view === 'code' && (
+            <motion.form key="code" className={step} onSubmit={verify} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }}>
+              <button type="button" className={back} onClick={() => setView(target?.account && target.account === prev ? 'home' : 'form')}><Icon name="ArrowLeft" size={16} /> Back</button>
+              <p className="text-muted-foreground">We sent a 6-digit code to <b className="text-ink">{sentTo}</b>.</p>
+              <Input id="auth-otp" className={cn(input, 'text-center font-display text-[26px] tracking-[.5em] md:text-[26px]')} autoFocus maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))} placeholder="••••••" inputMode="numeric" autoComplete="one-time-code" aria-label="6-digit code" aria-invalid={(otp.length === 6 && otp !== code) || undefined} />
+              {otp.length === 6 && otp !== code && <div className={err}>That code doesn't match. Check the latest code and try again.</div>}
+              <Button size="lg" className="w-full" disabled={otp.length !== 6}>{target?.draft ? 'Verify & create account' : 'Verify & sign in'}</Button>
+              <button type="button" className={cn(linkCls, 'self-center text-[14px]')} onClick={() => sendCode(target)}>Send a new code</button>
+            </motion.form>
+          )}
+        </AnimatePresence>
 
-            <p className="auth-terms">By signing in or continuing, you agree to our <Link to="/help" onClick={close}>Terms of Use</Link> and <Link to="/help" onClick={close}>Privacy Policy</Link>.</p>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+        <p className="mt-[26px] text-center text-[13.5px] text-ink-2 [&_a]:font-semibold [&_a]:text-brand [&_a]:underline [&_a]:underline-offset-3">By signing in or continuing, you agree to our <Link to="/help" onClick={close}>Terms of Use</Link> and <Link to="/help" onClick={close}>Privacy Policy</Link>.</p>
+      </DialogContent>
+    </Dialog>
   )
 }

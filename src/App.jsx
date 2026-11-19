@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, MotionConfig } from 'framer-motion'
 import { Header, Footer, MobileTabBar } from './components/Layout'
 import { Toasts } from './components/toast'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthModal } from './components/AuthModal'
 import Home from './pages/Home'
 import Search from './pages/Search'
@@ -27,8 +28,9 @@ export default function App() {
   const isAdmin = loc.pathname.startsWith('/admin')
   return (
     <MotionConfig reducedMotion="user">
+      <TooltipProvider delayDuration={300}>
       <ScrollTop />
-      {isAdmin ? <Suspense fallback={<div className="empty">Loading operations…</div>}><Admin /></Suspense> : (
+      {isAdmin ? <Suspense fallback={<div className="flex flex-col items-center gap-2.5 px-5 py-[60px] text-center">Loading operations…</div>}><Admin /></Suspense> : (
         <>
           <Header />
           <AnimatePresence mode="wait">
@@ -52,6 +54,7 @@ export default function App() {
       )}
       <AuthModal />
       <Toasts />
+      </TooltipProvider>
     </MotionConfig>
   )
 }
