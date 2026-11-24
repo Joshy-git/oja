@@ -8,7 +8,7 @@ import {
   SearchX, PackageX, Camera, Repeat, ThumbsUp, CircleCheck, Banknote, Tag, SlidersHorizontal, TriangleAlert,
   CreditCard, Landmark, Hash, Wallet, Link, Check, Circle, ArrowLeft, ChevronRight, LayoutDashboard, ScrollText,
   Ship, Menu, Paperclip, History, Coins, Star, X, Bell, Store, Plus, Minus, ArrowRight, TrendingDown, Hourglass, BellRing, Gamepad2, Headphones, Mail, ChevronDown, LayoutGrid, PanelLeft, CalendarDays, ArrowUpRight, ArrowDownRight, Copy, TrendingUp, Percent, LifeBuoy, WandSparkles, Users, EllipsisVertical,
-  Gem, Backpack, Baby, SquareCheck, Square, Download, Table, Funnel, ArrowUpDown, ChevronUp, ChevronsUpDown, Pencil, ExternalLink, EyeOff, Eye, Ellipsis, ChevronLeft,
+  Gem, Backpack, Baby, SquareCheck, Square, Download, Table, Funnel, ArrowUpDown, ChevronUp, ChevronsUpDown, Pencil, ExternalLink, EyeOff, Eye, Ellipsis, ChevronLeft, LogOut,
 } from 'lucide-react'
 
 const ICONS = {
@@ -19,7 +19,7 @@ const ICONS = {
   SearchX, PackageX, Camera, Repeat, ThumbsUp, CircleCheck, Banknote, Tag, SlidersHorizontal, TriangleAlert,
   CreditCard, Landmark, Hash, Wallet, Link, Check, Circle, ArrowLeft, ChevronRight, LayoutDashboard, ScrollText,
   Ship, Menu, Paperclip, History, Coins, Star, X, Bell, Store, Plus, Minus, ArrowRight, TrendingDown, Hourglass, BellRing, Gamepad2, Headphones, Mail, ChevronDown, LayoutGrid, PanelLeft, CalendarDays, ArrowUpRight, ArrowDownRight, Copy, TrendingUp, Percent, LifeBuoy, WandSparkles, Users, EllipsisVertical,
-  Gem, Backpack, Baby, SquareCheck, Square, Download, Table, Funnel, ArrowUpDown, ChevronUp, ChevronsUpDown, Pencil, ExternalLink, EyeOff, Eye, Ellipsis, ChevronLeft,
+  Gem, Backpack, Baby, SquareCheck, Square, Download, Table, Funnel, ArrowUpDown, ChevronUp, ChevronsUpDown, Pencil, ExternalLink, EyeOff, Eye, Ellipsis, ChevronLeft, LogOut,
 }
 
 export function Icon({ name, size = 18, stroke = 1.9, className = '', fill, ...rest }) {

@@ -20,6 +20,8 @@ import { naira, stagesFor } from '../lib/commerce'
 import { Promotions } from './AdminPages'
 import Settings, { DEFAULT_SETTINGS } from './AdminSettings'
 import Team from './AdminTeam'
+import AdminLogin from './AdminLogin'
+import { getAdminSession, adminSignOut } from '../lib/adminAuth'
 
 const ROLES = {
   'Super Admin': ['overview', 'orders', 'products', 'customers', 'inventory', 'logistics', 'procurement', 'promotions', 'reviews', 'support', 'audit', 'team', 'settings'],
@@ -293,7 +295,15 @@ function Overview({ products, orders, go }) {
 const NAV_GROUPS = [['Main', ['overview', 'orders', 'products', 'customers']], ['Operations', ['inventory', 'logistics', 'procurement']], ['Marketing', ['promotions', 'reviews']], ['System & support', ['support', 'audit', 'team', 'settings']]]
 const greeting = () => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening' }
 
+// Only signed-in staff see the dashboard
 export default function Admin() {
+  const [session, setSession] = useState(getAdminSession)
+  useEffect(() => { if (session) document.title = 'Oja Ops' }, [session])
+  if (!session) return <AdminLogin onSignedIn={setSession} />
+  return <Dashboard session={session} onSignOut={() => { adminSignOut(); setSession(null) }} />
+}
+
+function Dashboard({ session, onSignOut }) {
   const { products, state } = useStore()
   const [role, setRole] = useState('Super Admin')
   const allowed = ROLES[role]
@@ -356,6 +366,7 @@ export default function Admin() {
             <select id="adm-role" value={role} onChange={(e) => setRole(e.target.value)}>{Object.keys(ROLES).map((r) => <option key={r}>{r}</option>)}</select>
             {!edit && <span className="adm-ro"><Icon name="Lock" size={11} /> Read-only</span>}
           </div>
+          <button className="icon-btn adm-signout" onClick={onSignOut} aria-label={`Sign out ${session.email}`} title={`Sign out (${session.email})`}><Icon name="LogOut" size={17} /></button>
         </div>
       </aside>
 

@@ -1367,3 +1367,23 @@ section { margin-top: 40px; }
 @media (max-width: 1100px) { .footer-promo { max-width: 560px; } .footer-promo p { max-width: 58%; font-size: 17px; } }
 @media (max-width: 560px) { .footer-promo p { max-width: 64%; font-size: 16px; } }
 .order-ref-line { margin-top: 16px; }
+
+/* Dashboard sign-in */
+.adm-login { --adm-bg: #f6f7f9; --adm-line: #e7e9ee; min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: #f6f7f9; }
+.adm-login-card { width: min(400px, 100%); background: #fff; border: 1px solid #e7e9ee; border-radius: 8px; padding: 28px 26px 22px; box-shadow: var(--shadow); display: grid; }
+.adm-login-brand { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+.adm-login-brand .logo svg { height: 30px; }
+.adm-login-card h1 { font-size: 22px; }
+.adm-login-card > p { margin: 4px 0 18px; }
+.adm-login-pw { position: relative; display: block; }
+.adm-login-pw input { padding-right: 44px; }
+.adm-login-pw .icon-btn { position: absolute; right: 3px; top: 50%; translate: 0 -50%; }
+.adm-login-card .set-field input[aria-invalid="true"] { border-color: var(--bad); }
+.adm-login-card .err { margin: -4px 0 10px; }
+.adm-login-btn { justify-content: center; padding: 11px 16px; margin-top: 4px; }
+.adm-login-btn:disabled { opacity: .6; }
+.adm-login-note { display: flex; gap: 8px; align-items: flex-start; background: #fff3dc; color: #7a4a00; border-radius: 8px; padding: 10px 12px; font-size: 13.5px; }
+.adm-login-back { display: inline-flex; align-items: center; gap: 6px; justify-self: center; margin-top: 16px; font-size: 13.5px; color: var(--muted); }
+.adm-login-back:hover { color: var(--brand); }
+.adm-signout { margin-left: auto; }
+.admin.collapsed .adm-signout { display: none; }
